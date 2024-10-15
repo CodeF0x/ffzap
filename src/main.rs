@@ -24,16 +24,16 @@ struct CmdArgs {
     name_scheme: Option<String>,
 }
 
-fn main() -> io::Result<()> {
+fn main() {
     let cmd_args = CmdArgs::parse();
 
-    let paths = Arc::new(Mutex::new(
-        glob(&cmd_args.input_directory)
-            .unwrap()
-            .filter_map(Option::Some)
-            .map(|r| r.unwrap())
-            .collect(),
-    ));
+    let paths = Arc::new(Mutex::new(match glob(&cmd_args.input_directory) {
+        Ok(paths) => paths.filter_map(Result::ok).collect::<Vec<PathBuf>>(),
+        Err(err) => {
+            eprintln!("{}", err.msg);
+            std::process::exit(1);
+        }
+    }));
 
     let mut thread_handles = vec![];
 
@@ -50,7 +50,7 @@ fn main() -> io::Result<()> {
 
             match path_to_process {
                 Some(path) => {
-                    println!("Processing {:?}", path);
+                    println!("Processing {}", path.display());
                     let split_options = &mut args.ffmpeg_options.split(' ').collect::<Vec<&str>>();
                     let file_extension_from_options = split_options[split_options.len() - 1]
                         .split('.')
@@ -77,8 +77,8 @@ fn main() -> io::Result<()> {
                         .output()
                         .unwrap();
                     if !output.status.success() {
-                        println!("Error!");
-                        println!("Error is: {}", String::from_utf8(output.stderr).unwrap());
+                        eprintln!("Error!");
+                        eprintln!("Error is: {}", String::from_utf8_lossy(&output.stderr));
                         break;
                     }
                 }
@@ -94,6 +94,4 @@ fn main() -> io::Result<()> {
     for handle in thread_handles {
         handle.join().unwrap();
     }
-
-    Ok(())
 }
