@@ -15,10 +15,10 @@ struct CmdArgs {
     ffmpeg_options: String,
 
     #[arg(short, long)]
-    source_dir: String,
+    input_directory: String,
 
     #[arg(short, long)]
-    output_dir: Option<String>,
+    output_directory: Option<String>,
 
     #[arg(short, long)]
     name_scheme: Option<String>,
@@ -28,7 +28,7 @@ fn main() -> io::Result<()> {
     let cmd_args = CmdArgs::parse();
 
     let paths = Arc::new(Mutex::new(
-        read_dir(Path::new(&cmd_args.source_dir))?
+        read_dir(Path::new(&cmd_args.input_directory))?
             .map(|res| res.map(|e| e.path()))
             .collect::<Result<Vec<PathBuf>, io::Error>>()?,
     ));
