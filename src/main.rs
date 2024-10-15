@@ -1,6 +1,6 @@
 use clap::Parser;
-use std::fs::read_dir;
-use std::path::{Path, PathBuf};
+use glob::glob;
+use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::sync::{Arc, Mutex};
 use std::{io, thread};
@@ -28,15 +28,17 @@ fn main() -> io::Result<()> {
     let cmd_args = CmdArgs::parse();
 
     let paths = Arc::new(Mutex::new(
-        read_dir(Path::new(&cmd_args.input_directory))?
-            .map(|res| res.map(|e| e.path()))
-            .collect::<Result<Vec<PathBuf>, io::Error>>()?,
+        glob(&cmd_args.input_directory)
+            .unwrap()
+            .filter_map(Option::Some)
+            .map(|r| r.unwrap())
+            .collect(),
     ));
 
     let mut thread_handles = vec![];
 
     for _ in 0..cmd_args.thread_count {
-        let paths = Arc::clone(&paths);
+        let paths: Arc<Mutex<Vec<PathBuf>>> = Arc::clone(&paths);
         let args = cmd_args.clone();
 
         let handle = thread::spawn(move || loop {
