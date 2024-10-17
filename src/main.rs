@@ -32,7 +32,7 @@ struct CmdArgs {
     ///
     /// Example: /destination/{{dir}}/{{name}}_transcoded.{{ext}}
     ///
-    /// Outputs the file in /destination, mirroring the original structure and keeping the file extension.
+    /// Outputs the file in /destination, mirroring the original structure and keeping both the file extension and name, while adding _transcoded to the name.
     #[arg(short, long)]
     output: String,
     // {{ext}} -> extension, {{name}} filename without extension, {{dir}} -> directory structure from starting point to file, {{parent}} -> parent directory of starting point
@@ -51,7 +51,7 @@ fn main() {
 
     let mut thread_handles = vec![];
 
-    for _ in 0..cmd_args.thread_count {
+    for thread in 0..cmd_args.thread_count {
         let paths: Arc<Mutex<Vec<PathBuf>>> = Arc::clone(&paths);
         let args = cmd_args.clone();
 
@@ -64,7 +64,7 @@ fn main() {
 
             match path_to_process {
                 Some(path) => {
-                    println!("Processing {}", path.display());
+                    println!("[THREAD {thread}] -- Processing {}", path.display());
                     let split_options = &mut args.ffmpeg_options.split(' ').collect::<Vec<&str>>();
 
                     let mut final_file_name = args
@@ -93,7 +93,7 @@ fn main() {
                             Ok(_) => {}
                             Err(err) => {
                                 eprintln!(
-                                    "Could not create directory structure for file {}",
+                                    "[THREAD {thread}] -- Could not create directory structure for file {}",
                                     final_file_name
                                 );
                                 eprintln!("{}", err)
@@ -110,14 +110,17 @@ fn main() {
                         .output()
                     {
                         if output.status.success() {
-                            println!("Success, saving to {final_file_name}");
+                            println!("[THREAD {thread}] -- Success, saving to {final_file_name}");
                         } else {
-                            eprintln!("Error!");
-                            eprintln!("Error is: {}", String::from_utf8_lossy(&output.stderr));
-                            eprintln!("Continuing with next task if there's more to do...");
+                            eprintln!("[THREAD {thread}] -- Error!");
+                            eprintln!(
+                                "[THREAD {thread}] -- Error is: {}",
+                                String::from_utf8_lossy(&output.stderr)
+                            );
+                            eprintln!("[THREAD {thread}] -- Continuing with next task if there's more to do...");
                         }
                     } else {
-                        eprintln!("There was an error running ffmpeg. Please check it's correctly installed and working as intended.");
+                        eprintln!("[THREAD {thread}] -- There was an error running ffmpeg. Please check it's correctly installed and working as intended.");
                     }
                 }
                 None => {
