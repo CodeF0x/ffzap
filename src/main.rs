@@ -120,7 +120,7 @@ fn main() {
                             eprintln!("[THREAD {thread}] -- Continuing with next task if there's more to do...");
                         }
                     } else {
-                        eprintln!("[THREAD {thread}] -- There was an error running ffmpeg. Please check it's correctly installed and working as intended.");
+                        eprintln!("[THREAD {thread}] -- There was an error running ffmpeg. Please check if it's correctly installed and working as intended.");
                     }
                 }
                 None => {

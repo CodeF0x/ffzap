@@ -110,6 +110,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d3fd119d74b830634cea2a0f58bbd0d54540518a14397557951e79340abc28c0"
 
 [[package]]
+name = "ffzap"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "glob",
+ "rand",
+]
+
+[[package]]
 name = "getrandom"
 version = "0.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -143,15 +152,6 @@ name = "libc"
 version = "0.2.159"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "561d97a539a36e26a9a5fad1ea11a3039a67714694aaa379433e580854bc3dc5"
-
-[[package]]
-name = "multithread"
-version = "0.1.0"
-dependencies = [
- "clap",
- "glob",
- "rand",
-]
 
 [[package]]
 name = "ppv-lite86"
