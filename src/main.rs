@@ -105,7 +105,7 @@ fn main() {
                         .args(["-i", path.to_str().unwrap()])
                         .args(split_options)
                         .arg(&final_file_name)
-                        .stdout(Stdio::piped())
+                        .stdout(Stdio::null())
                         .stderr(Stdio::piped())
                         .output()
                     {
