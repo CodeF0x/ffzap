@@ -1,8 +1,7 @@
 use clap::Parser;
-use glob::glob;
 use std::ffi::OsStr;
 use std::fs::create_dir_all;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::process::{Command, Stdio};
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -18,9 +17,9 @@ struct CmdArgs {
     #[arg(short, long, allow_hyphen_values = true)]
     ffmpeg_options: String,
 
-    /// the directory with all files you want to process. supports unix globs
-    #[arg(short, long)]
-    input_directory: String,
+    /// the files you want to process.
+    #[arg(short, long, num_args = 1.., value_delimiter = ' ')]
+    input_directory: Vec<String>,
 
     /// Specify the output file pattern. Use placeholders to customize file paths:
     ///
@@ -41,19 +40,14 @@ struct CmdArgs {
 fn main() {
     let cmd_args = CmdArgs::parse();
 
-    let paths = Arc::new(Mutex::new(match glob(&cmd_args.input_directory) {
-        Ok(paths) => paths.filter_map(Result::ok).collect::<Vec<PathBuf>>(),
-        Err(err) => {
-            eprintln!("{}", err.msg);
-            std::process::exit(1);
-        }
-    }));
+    let paths = Arc::new(Mutex::new(cmd_args.input_directory));
 
     let mut thread_handles = vec![];
 
     for thread in 0..cmd_args.thread_count {
-        let paths: Arc<Mutex<Vec<PathBuf>>> = Arc::clone(&paths);
-        let args = cmd_args.clone();
+        let paths: Arc<Mutex<Vec<String>>> = Arc::clone(&paths);
+        let ffmpeg_options = cmd_args.ffmpeg_options.clone();
+        let output = cmd_args.output.clone();
 
         let handle = thread::spawn(move || loop {
             let path_to_process = {
@@ -64,12 +58,21 @@ fn main() {
 
             match path_to_process {
                 Some(path) => {
-                    println!("[THREAD {thread}] -- Processing {}", path.display());
-                    let split_options = &mut args.ffmpeg_options.split(' ').collect::<Vec<&str>>();
+                    let path = Path::new(&path);
 
-                    let mut final_file_name = args
-                        .output
-                        .replace("{{ext}}", path.extension().unwrap().to_str().unwrap());
+                    if !path.is_file() {
+                        eprintln!(
+                            "[THREAD {thread}] -- {} doesn't appear to be a file, ignoring. Continuing with next task if there's more to do...",
+                            path.to_str().unwrap()
+                        );
+                        continue;
+                    }
+
+                    println!("[THREAD {thread}] -- Processing {}", path.display());
+                    let split_options = &mut ffmpeg_options.split(' ').collect::<Vec<&str>>();
+
+                    let mut final_file_name =
+                        output.replace("{{ext}}", path.extension().unwrap().to_str().unwrap());
                     final_file_name = final_file_name
                         .replace("{{name}}", &path.file_stem().unwrap().to_str().unwrap());
                     final_file_name = final_file_name.replace(
