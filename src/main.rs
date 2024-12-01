@@ -43,7 +43,6 @@ fn main() {
     let cmd_args = CmdArgs::parse();
 
     let progress = ProgressBar::new(cmd_args.input_directory.len() as u64);
-    let should_update = Arc::new(Mutex::new(false));
     progress.set_style(
         ProgressStyle::default_bar()
             .template("{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len}")
@@ -56,7 +55,7 @@ fn main() {
 
     for thread in 0..cmd_args.thread_count {
         let paths = Arc::clone(&paths);
-        let should_update = Arc::clone(&should_update);
+        let progress = progress.clone();
         let ffmpeg_options = cmd_args.ffmpeg_options.clone();
         let output = cmd_args.output.clone();
 
@@ -132,8 +131,8 @@ fn main() {
                             );
                             eprintln!("[THREAD {thread}] -- Continuing with next task if there's more to do...");
                         }
-                        let mut update = should_update.lock().unwrap();
-                        *update = true;
+
+                        progress.inc(1);
                     } else {
                         eprintln!("[THREAD {thread}] -- There was an error running ffmpeg. Please check if it's correctly installed and working as intended.");
                     }
@@ -147,14 +146,10 @@ fn main() {
         thread_handles.push(handle);
     }
 
-    let _ = thread::spawn(move || {
+    thread::spawn(move || {
         while !progress.is_finished() {
-            let mut update = should_update.lock().unwrap();
-            if *update {
-                progress.inc(1);
-                *update = false;
-            }
-            thread::sleep(Duration::new(0, 250));
+            progress.tick();
+            thread::sleep(Duration::new(0, 500));
         }
         progress.finish();
     });
