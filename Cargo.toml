@@ -11,3 +11,4 @@ repository = "https://github.com/CodeF0x/ffzap"
 
 [dependencies]
 clap = { version = "4.5.20", features = ["derive"] }
+indicatif = "0.17.9"
