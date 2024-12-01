@@ -34,17 +34,14 @@ as a string and without the file name.
 With a single file it doesn't really make sense to use ffzap, so consider this more advanced example:
 
 ```bash
-ffzap -i "vids/**/*.{mp4,mkv}" -f "-c:v libx264 -b:v 1000k" -o transcoded/{{name}}.mp4 -t 4
+ffzap -i vids/**/*.{mp4,mkv} -f "-c:v libx264 -b:v 1000k" -o transcoded/{{name}}.mp4 -t 4
 ```
 
 This command takes all videos in `vids` and its subfolders ending in `.mp4` and `.mkv`, processes them using the
 options provided by `-f` and saves them to a (new) directory called `transcoded`, keeping the original filename and
 changing the file extension to `.mp4` while processing 4 files in parallel.
 
-Notice that, when using glob patterns, `-i` (short for `--input-directory`) needs to be a string so that ffzap executes
-the glob pattern and **not** your shell. Otherwise, the command will fail.
-
-For more `-o` (short for `--output-directory`) options, run `ffzap --help`. For more ffmpeg options,
+For more info on the `-o` syntax, run `ffzap --help`. For more ffmpeg options,
 visit [ffmpeg's documentation](https://ffmpeg.org/ffmpeg.html).
 
 ### Requirements
