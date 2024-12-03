@@ -1,3 +1,6 @@
+mod progress;
+
+use crate::progress::Progress;
 use clap::Parser;
 use std::ffi::OsStr;
 use std::fs::create_dir_all;
@@ -40,19 +43,22 @@ struct CmdArgs {
 fn main() {
     let cmd_args = CmdArgs::parse();
 
+    let progress = Arc::new(Progress::new(cmd_args.input_directory.len()));
+    progress.start_stick(500);
+
     let paths = Arc::new(Mutex::new(cmd_args.input_directory));
 
     let mut thread_handles = vec![];
 
     for thread in 0..cmd_args.thread_count {
-        let paths: Arc<Mutex<Vec<String>>> = Arc::clone(&paths);
+        let paths = Arc::clone(&paths);
+        let progress = Arc::clone(&progress);
         let ffmpeg_options = cmd_args.ffmpeg_options.clone();
         let output = cmd_args.output.clone();
 
         let handle = thread::spawn(move || loop {
             let path_to_process = {
                 let mut queue = paths.lock().unwrap();
-
                 queue.pop()
             };
 
@@ -61,14 +67,18 @@ fn main() {
                     let path = Path::new(&path);
 
                     if !path.is_file() {
-                        eprintln!(
+                        progress.println(format!(
                             "[THREAD {thread}] -- {} doesn't appear to be a file, ignoring. Continuing with next task if there's more to do...",
                             path.to_str().unwrap()
-                        );
+                        ));
                         continue;
                     }
 
-                    println!("[THREAD {thread}] -- Processing {}", path.display());
+                    progress.println(format!(
+                        "[THREAD {thread}] -- Processing {}",
+                        path.display()
+                    ));
+
                     let split_options = &mut ffmpeg_options.split(' ').collect::<Vec<&str>>();
 
                     let mut final_file_name =
@@ -95,10 +105,10 @@ fn main() {
                         match create_dir_all(final_path_parent) {
                             Ok(_) => {}
                             Err(err) => {
-                                eprintln!(
-                                    "[THREAD {thread}] -- Could not create directory structure for file {}",
+                                progress.println(
+                                    format!("[THREAD {thread}] -- Could not create directory structure for file {}",
                                     final_file_name
-                                );
+                                ));
                                 eprintln!("{}", err)
                             }
                         }
@@ -113,15 +123,19 @@ fn main() {
                         .output()
                     {
                         if output.status.success() {
-                            println!("[THREAD {thread}] -- Success, saving to {final_file_name}");
+                            progress.println(format!(
+                                "[THREAD {thread}] -- Success, saving to {final_file_name}"
+                            ));
                         } else {
-                            eprintln!("[THREAD {thread}] -- Error!");
-                            eprintln!(
+                            progress.println(format!("[THREAD {thread}] -- Error!"));
+                            progress.println(format!(
                                 "[THREAD {thread}] -- Error is: {}",
                                 String::from_utf8_lossy(&output.stderr)
-                            );
-                            eprintln!("[THREAD {thread}] -- Continuing with next task if there's more to do...");
+                            ));
+                            progress.println(format!("[THREAD {thread}] -- Continuing with next task if there's more to do..."));
                         }
+
+                        progress.inc(1);
                     } else {
                         eprintln!("[THREAD {thread}] -- There was an error running ffmpeg. Please check if it's correctly installed and working as intended.");
                     }
@@ -138,4 +152,6 @@ fn main() {
     for handle in thread_handles {
         handle.join().unwrap();
     }
+
+    progress.finish();
 }
