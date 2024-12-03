@@ -12,7 +12,7 @@ use std::thread;
 #[derive(Parser, Debug, Clone)]
 #[command(version, about)]
 struct CmdArgs {
-    /// the amount of threads you want to utilize. most systems can handle 2. go higher if you have a powerful computer.
+    /// the amount of threads you want to utilize. most systems can handle 2. Go higher if you have a powerful computer.
     #[arg(short, long, default_value_t = 2)]
     thread_count: u8,
 
@@ -23,6 +23,10 @@ struct CmdArgs {
     /// the files you want to process.
     #[arg(short, long, num_args = 1.., value_delimiter = ' ')]
     input_directory: Vec<String>,
+
+    /// if ffmpeg should overwrite files if they already exist. Default is false
+    #[arg(long, default_value_t = false)]
+    overwrite: bool,
 
     /// Specify the output file pattern. Use placeholders to customize file paths:
     ///
@@ -114,10 +118,16 @@ fn main() {
                         }
                     }
 
+                    let overwrite = match cmd_args.overwrite {
+                        true => "-y",
+                        false => "-n",
+                    };
+
                     if let Ok(output) = Command::new("ffmpeg")
                         .args(["-i", path.to_str().unwrap()])
                         .args(split_options)
                         .arg(&final_file_name)
+                        .arg(overwrite)
                         .stdout(Stdio::null())
                         .stderr(Stdio::piped())
                         .output()
@@ -154,4 +164,6 @@ fn main() {
     }
 
     progress.finish();
+    // print an empty line because otherwise the input field is next to the progress bar after the program finishes.
+    println!("\n");
 }
