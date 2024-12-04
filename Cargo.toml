@@ -1,6 +1,6 @@
 [package]
 name = "ffzap"
-version = "0.1.4"
+version = "0.2.0"
 edition = "2021"
 description = "⚡ A multithreaded CLI for digital media processing using ffmpeg. If ffmpeg can do it, ffzap can do it - as many files in parallel as your CPU can handle."
 license-file = "license.md"
