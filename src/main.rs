@@ -21,7 +21,7 @@ struct CmdArgs {
     ffmpeg_options: String,
 
     /// the files you want to process.
-    #[arg(short, long, num_args = 1.., value_delimiter = ' ')]
+    #[arg(short, long, num_args = 1..,)]
     input_directory: Vec<String>,
 
     /// if ffmpeg should overwrite files if they already exist. Default is false
@@ -46,6 +46,8 @@ struct CmdArgs {
 
 fn main() {
     let cmd_args = CmdArgs::parse();
+
+    println!("{:?}", cmd_args.input_directory);
 
     let progress = Arc::new(Progress::new(cmd_args.input_directory.len()));
     progress.start_stick(500);
