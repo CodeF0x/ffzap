@@ -1,4 +1,5 @@
 use crate::progress::Progress;
+use chrono;
 use std::fs;
 use std::fs::{File, OpenOptions};
 use std::io::Write;
@@ -49,8 +50,8 @@ impl Logger {
 
         Self::setup_log_dir(&log_path);
 
-        let increment = fs::read_dir(&log_path).unwrap().count() + 1;
-        let mut current_log = log_path.join(increment.to_string());
+        let locale_time = chrono::Local::now().format("%d-%m-%Y@%H:%M:%S");
+        let mut current_log = log_path.join(locale_time.to_string());
         current_log.set_extension("log");
 
         Logger {
