@@ -53,8 +53,6 @@ struct CmdArgs {
 fn main() {
     let cmd_args = CmdArgs::parse();
 
-    println!("{:?}", cmd_args.input_directory);
-
     let progress = Arc::new(Progress::new(cmd_args.input_directory.len()));
     progress.start_stick(500);
 
