@@ -50,7 +50,7 @@ impl Logger {
 
         Self::setup_log_dir(&log_path);
 
-        let locale_time = chrono::Local::now().format("%d-%m-%Y@%H:%M:%S");
+        let locale_time = chrono::Local::now().format("%d-%m-%YT%H-%M-%S");
         let mut current_log = log_path.join(locale_time.to_string());
         current_log.set_extension("log");
 
