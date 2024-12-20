@@ -1,5 +1,7 @@
+mod logger;
 mod progress;
 
+use crate::logger::Logger;
 use crate::progress::Progress;
 use clap::Parser;
 use std::ffi::OsStr;
@@ -14,7 +16,7 @@ use std::thread;
 struct CmdArgs {
     /// the amount of threads you want to utilize. most systems can handle 2. Go higher if you have a powerful computer.
     #[arg(short, long, default_value_t = 2)]
-    thread_count: u8,
+    thread_count: u16,
 
     /// options you want to pass to ffmpeg. for the output file name, use --output
     #[arg(short, long, allow_hyphen_values = true)]
@@ -27,6 +29,10 @@ struct CmdArgs {
     /// if ffmpeg should overwrite files if they already exist. Default is false
     #[arg(long, default_value_t = false)]
     overwrite: bool,
+
+    /// if verbose logs should be shown while ffzap is running
+    #[arg(long, default_value_t = false)]
+    verbose: bool,
 
     /// Specify the output file pattern. Use placeholders to customize file paths:
     ///
@@ -47,18 +53,20 @@ struct CmdArgs {
 fn main() {
     let cmd_args = CmdArgs::parse();
 
-    println!("{:?}", cmd_args.input_directory);
-
     let progress = Arc::new(Progress::new(cmd_args.input_directory.len()));
     progress.start_stick(500);
 
     let paths = Arc::new(Mutex::new(cmd_args.input_directory));
+
+    let logger = Arc::new(Logger::new(Arc::clone(&progress)));
 
     let mut thread_handles = vec![];
 
     for thread in 0..cmd_args.thread_count {
         let paths = Arc::clone(&paths);
         let progress = Arc::clone(&progress);
+        let logger = Arc::clone(&logger);
+        let verbose = cmd_args.verbose;
         let ffmpeg_options = cmd_args.ffmpeg_options.clone();
         let output = cmd_args.output.clone();
 
@@ -73,17 +81,14 @@ fn main() {
                     let path = Path::new(&path);
 
                     if !path.is_file() {
-                        progress.println(format!(
-                            "[THREAD {thread}] -- {} doesn't appear to be a file, ignoring. Continuing with next task if there's more to do...",
-                            path.to_str().unwrap()
-                        ));
+                        logger.log_error(format!(
+                            "{} doesn't appear to be a file, ignoring. Continuing with next task if there's more to do...",
+                            path.display()
+                        ), thread, verbose);
                         continue;
                     }
 
-                    progress.println(format!(
-                        "[THREAD {thread}] -- Processing {}",
-                        path.display()
-                    ));
+                    logger.log_info(format!("Processing {}", path.display()), thread, verbose);
 
                     let split_options = &mut ffmpeg_options.split(' ').collect::<Vec<&str>>();
 
@@ -111,11 +116,15 @@ fn main() {
                         match create_dir_all(final_path_parent) {
                             Ok(_) => {}
                             Err(err) => {
-                                progress.println(
-                                    format!("[THREAD {thread}] -- Could not create directory structure for file {}",
-                                    final_file_name
-                                ));
-                                eprintln!("{}", err)
+                                logger.log_error(
+                                    format!(
+                                        "Could not create directory structure for file {}",
+                                        final_file_name
+                                    ),
+                                    thread,
+                                    verbose,
+                                );
+                                logger.log_error(format!("{}", err), thread, verbose);
                             }
                         }
                     }
@@ -135,19 +144,24 @@ fn main() {
                         .output()
                     {
                         if output.status.success() {
-                            progress.println(format!(
-                                "[THREAD {thread}] -- Success, saving to {final_file_name}"
-                            ));
+                            logger.log_info(
+                                format!("Success, saving to {final_file_name}"),
+                                thread,
+                                verbose,
+                            );
+                            progress.inc(1);
                         } else {
-                            progress.println(format!("[THREAD {thread}] -- Error!"));
-                            progress.println(format!(
-                                "[THREAD {thread}] -- Error is: {}",
-                                String::from_utf8_lossy(&output.stderr)
-                            ));
-                            progress.println(format!("[THREAD {thread}] -- Continuing with next task if there's more to do..."));
+                            logger.log_error(
+                                format!("Error is: {}", String::from_utf8_lossy(&output.stderr)),
+                                thread,
+                                verbose,
+                            );
+                            logger.log_info(
+                                "Continuing with next task if there's more to do...".to_string(),
+                                thread,
+                                verbose,
+                            );
                         }
-
-                        progress.inc(1);
                     } else {
                         eprintln!("[THREAD {thread}] -- There was an error running ffmpeg. Please check if it's correctly installed and working as intended.");
                     }
@@ -166,6 +180,14 @@ fn main() {
     }
 
     progress.finish();
-    // print an empty line because otherwise the input field is next to the progress bar after the program finishes.
-    println!("\n");
+
+    println!(
+        "{}",
+        format!(
+            "{} out of {} files have been successful. A detailed log has been written to {}",
+            progress.value(),
+            progress.len(),
+            logger.current_log.display()
+        )
+    );
 }

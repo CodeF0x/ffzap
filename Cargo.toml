@@ -1,6 +1,6 @@
 [package]
 name = "ffzap"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 description = "⚡ A multithreaded CLI for digital media processing using ffmpeg. If ffmpeg can do it, ffzap can do it - as many files in parallel as your CPU can handle."
 license-file = "license.md"
@@ -10,5 +10,7 @@ repository = "https://github.com/CodeF0x/ffzap"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+chrono = "0.4.39"
 clap = { version = "4.5.20", features = ["derive"] }
+dirs = "5.0.1"
 indicatif = "0.17.9"

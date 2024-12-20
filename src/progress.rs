@@ -36,6 +36,14 @@ impl Progress {
     }
 
     pub(crate) fn finish(&self) {
-        self.progress.finish();
+        self.progress.abandon();
+    }
+
+    pub(crate) fn len(&self) -> u64 {
+        self.progress.length().unwrap()
+    }
+
+    pub(crate) fn value(&self) -> u64 {
+        self.progress.position()
     }
 }
