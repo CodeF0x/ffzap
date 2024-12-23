@@ -1,20 +1,57 @@
 use crate::progress::Progress;
-use chrono;
 use std::fs;
-use std::fs::{File, OpenOptions};
+use std::fs::File;
 use std::io::Write;
-use std::path::PathBuf;
-use std::sync::Arc;
+use std::path::{Display, PathBuf};
+use std::sync::{Arc, Mutex};
 
 pub(crate) struct Logger {
-    pub(crate) current_log: PathBuf,
     progress: Arc<Progress>,
+    log_file: Arc<Mutex<File>>,
+    log_path: PathBuf,
 }
 
 impl Logger {
     pub(crate) fn new(progress: Arc<Progress>) -> Self {
-        let app_name = "ffzap";
+        let path_file_tuple = Self::setup_log_dir_and_create_log_file();
+
+        let log_path = path_file_tuple.0;
+        let log_file = path_file_tuple.1;
+
+        Logger {
+            log_path,
+            log_file,
+            progress,
+        }
+    }
+
+    pub(crate) fn log_info(&self, line: String, thread: u16, print: bool) {
+        let line = format!("[INFO in THREAD {thread}] -- {line}\n");
+
+        self.write_to_log(&line);
+
+        if print {
+            self.print(line);
+        }
+    }
+
+    pub(crate) fn log_error(&self, line: String, thread: u16, print: bool) {
+        let line = format!("[ERROR in THREAD {thread} -- {line}\n");
+
+        self.write_to_log(&line);
+
+        if print {
+            self.print(line);
+        }
+    }
+
+    pub(crate) fn get_log_path(&self) -> Display {
+        self.log_path.display()
+    }
+
+    fn setup_log_dir_and_create_log_file() -> (PathBuf, Arc<Mutex<File>>) {
         let log_path;
+        let app_name = "ffzap";
 
         #[cfg(target_os = "windows")]
         {
@@ -48,52 +85,24 @@ impl Logger {
                 .join("logs")
         }
 
-        Self::setup_log_dir(&log_path);
+        fs::create_dir_all(&log_path).unwrap();
 
         let locale_time = chrono::Local::now().format("%d-%m-%YT%H-%M-%S");
         let mut current_log = log_path.join(locale_time.to_string());
         current_log.set_extension("log");
 
-        Logger {
-            current_log,
-            progress,
-        }
+        (
+            current_log.clone(),
+            Arc::new(Mutex::new(File::create(&current_log).unwrap())),
+        )
     }
 
-    pub(crate) fn log_info(&self, line: String, thread: u16, print: bool) {
-        let line = format!("[INFO in THREAD {thread}] -- {line}");
-
-        let mut log_file = self.get_log_file();
-
-        writeln!(&mut log_file, "{}", line).unwrap();
-
-        if print {
-            self.print(line);
-        }
-    }
-
-    pub(crate) fn log_error(&self, line: String, thread: u16, print: bool) {
-        let line = format!("[ERROR in THREAD {thread} -- {line}");
-
-        let mut log_file = self.get_log_file();
-
-        writeln!(&mut log_file, "{}", line).unwrap();
-
-        if print {
-            self.print(line);
-        }
-    }
-
-    fn setup_log_dir(path: &PathBuf) {
-        fs::create_dir_all(path).unwrap();
-    }
-
-    fn get_log_file(&self) -> File {
-        OpenOptions::new()
-            .append(true)
-            .create(true)
-            .open(&self.current_log)
+    fn write_to_log(&self, line: &str) {
+        self.log_file
+            .lock()
             .unwrap()
+            .write_all(line.as_bytes())
+            .unwrap();
     }
 
     fn print(&self, line: String) {
