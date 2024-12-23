@@ -181,13 +181,11 @@ fn main() {
 
     progress.finish();
 
-    println!(
-        "{}",
-        format!(
-            "{} out of {} files have been successful. A detailed log has been written to {}",
-            progress.value(),
-            progress.len(),
-            logger.current_log.display()
-        )
+    let final_output = format!(
+        "{} out of {} files have been successful. A detailed log has been written to {}",
+        progress.value(),
+        progress.len(),
+        logger.get_log_path()
     );
+    println!("{final_output}");
 }
