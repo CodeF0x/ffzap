@@ -5,7 +5,7 @@ use crate::logger::Logger;
 use crate::progress::Progress;
 use clap::Parser;
 use std::ffi::OsStr;
-use std::fs::create_dir_all;
+use std::fs::{create_dir_all, remove_file};
 use std::io::ErrorKind;
 use std::path::Path;
 use std::process::{exit, Command, Stdio};
@@ -38,6 +38,10 @@ struct CmdArgs {
     /// If verbose logs should be shown while ffzap is running
     #[arg(long, default_value_t = false)]
     verbose: bool,
+
+    /// deletes the source file after it was successfully processed
+    #[arg(long, short, default_value_t = false)]
+    delete: bool,
 
     /// Specify the output file pattern. Use placeholders to customize file paths:
     ///
@@ -185,6 +189,22 @@ fn main() {
                                 thread,
                                 verbose,
                             );
+
+                            if cmd_args.overwrite {
+                                match remove_file(path) {
+                                    Ok(_) => logger.log_info(
+                                        format!("Removed {}", path),
+                                        thread,
+                                        verbose,
+                                    ),
+                                    Err(err) => logger.log_error(
+                                        format!("Could not delete {path}: {:?}", err),
+                                        thread,
+                                        verbose,
+                                    ),
+                                }
+                            }
+
                             progress.inc(1);
                         } else {
                             logger.log_error(
