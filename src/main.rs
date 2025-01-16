@@ -9,7 +9,7 @@ use std::fs::create_dir_all;
 use std::path::Path;
 use std::process::{Command, Stdio};
 use std::sync::{Arc, Mutex};
-use std::thread;
+use std::{fs, thread};
 
 #[derive(Parser, Debug, Clone)]
 #[command(version, about)]
@@ -23,8 +23,12 @@ struct CmdArgs {
     ffmpeg_options: String,
 
     /// the files you want to process.
-    #[arg(short, long, num_args = 1..,)]
-    input_directory: Vec<String>,
+    #[arg(short, long, num_args = 1.., required_unless_present = "input_file", conflicts_with = "input_file")]
+    input_directory: Option<Vec<String>>,
+
+    /// path to a file containing paths to process. One path per line
+    #[arg(long, required_unless_present = "input_directory", conflicts_with = "input_directory")]
+    paths_file: Option<String>,
 
     /// if ffmpeg should overwrite files if they already exist. Default is false
     #[arg(long, default_value_t = false)]
@@ -53,10 +57,23 @@ struct CmdArgs {
 fn main() {
     let cmd_args = CmdArgs::parse();
 
-    let progress = Arc::new(Progress::new(cmd_args.input_directory.len()));
+    let paths: Vec<String>;
+    if let Some(input_file_path) = cmd_args.paths_file {
+        paths = fs::read_to_string(&input_file_path)
+            .unwrap()
+            .trim()
+            .split('\n')
+            .into_iter()
+            .map(|s| s.trim().to_string())
+            .collect();
+    } else {
+        paths = cmd_args.input_directory.unwrap();
+    }
+
+    let progress = Arc::new(Progress::new(paths.len()));
     progress.start_stick(500);
 
-    let paths = Arc::new(Mutex::new(cmd_args.input_directory));
+    let paths = Arc::new(Mutex::new(paths));
 
     let logger = Arc::new(Logger::new(Arc::clone(&progress)));
 
