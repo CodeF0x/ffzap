@@ -15,33 +15,33 @@ use std::{fs, thread};
 #[derive(Parser, Debug, Clone)]
 #[command(version, about)]
 struct CmdArgs {
-    /// the amount of threads you want to utilize. most systems can handle 2. Go higher if you have a powerful computer.
-    #[arg(short, long, default_value_t = 2)]
+    /// The amount of threads you want to utilize. most systems can handle 2. Go higher if you have a powerful computer. Default is 2. Can't be lower than 1
+    #[arg(short, long, default_value_t = 2, value_parser = clap::value_parser!(u16).range(1..))]
     thread_count: u16,
 
-    /// options you want to pass to ffmpeg. for the output file name, use --output
+    /// Options you want to pass to ffmpeg. For the output file name, use --output
     #[arg(short, long, allow_hyphen_values = true)]
     ffmpeg_options: String,
 
-    /// the files you want to process.
+    /// The files you want to process.
     #[arg(short, long, num_args = 1.., required_unless_present = "input_file", conflicts_with = "input_file")]
     input_directory: Option<Vec<String>>,
 
-    /// path to a file containing paths to process. One path per line
+    /// Path to a file containing paths to process. One path per line
     #[arg(long, required_unless_present = "input_directory", conflicts_with = "input_directory")]
     input_file: Option<String>,
 
-    /// if ffmpeg should overwrite files if they already exist. Default is false
+    /// If ffmpeg should overwrite files if they already exist. Default is false
     #[arg(long, default_value_t = false)]
     overwrite: bool,
 
-    /// if verbose logs should be shown while ffzap is running
+    /// If verbose logs should be shown while ffzap is running
     #[arg(long, default_value_t = false)]
     verbose: bool,
 
     /// Specify the output file pattern. Use placeholders to customize file paths:
     ///
-    /// {{dir}}  - Original file's directory structure
+    /// {{dir}}  - Entire specified file path, e.g. ./path/to/file.txt -> ?./path/to/
     ///
     /// {{name}} - Original file's name (without extension)
     ///
@@ -91,14 +91,12 @@ fn main() {
         paths = cmd_args.input_directory.unwrap();
     }
 
-    let progress = Arc::new(Progress::new(paths.len()));
-    progress.start_stick(500);
-
     let paths = Arc::new(Mutex::new(paths));
-
+    let progress = Arc::new(Progress::new(paths.lock().unwrap().len()));
     let logger = Arc::new(Logger::new(Arc::clone(&progress)));
-
     let mut thread_handles = vec![];
+
+    progress.start_stick(500);
 
     for thread in 0..cmd_args.thread_count {
         let paths = Arc::clone(&paths);
