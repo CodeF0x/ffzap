@@ -5,7 +5,7 @@ use crate::logger::Logger;
 use crate::progress::Progress;
 use clap::Parser;
 use std::ffi::OsStr;
-use std::fs::create_dir_all;
+use std::fs::{create_dir_all, remove_file};
 use std::io::ErrorKind;
 use std::path::Path;
 use std::process::{exit, Command, Stdio};
@@ -38,6 +38,10 @@ struct CmdArgs {
     /// If verbose logs should be shown while ffzap is running
     #[arg(long, default_value_t = false)]
     verbose: bool,
+
+    /// Delete the source file after it was successfully processed. If the process fails, the file is kept.
+    #[arg(long, default_value_t = false)]
+    delete: bool,
 
     /// Specify the output file pattern. Use placeholders to customize file paths:
     ///
@@ -185,13 +189,43 @@ fn main() {
                                 thread,
                                 verbose,
                             );
+
+                            if cmd_args.delete {
+                                match remove_file(path) {
+                                    Ok(_) => logger.log_info(
+                                        format!("Removed {}", path.display()),
+                                        thread,
+                                        verbose,
+                                    ),
+                                    Err(err) => match err.kind() {
+                                        ErrorKind::PermissionDenied => logger.log_error(
+                                            format!("Permission denied when trying to delete file {}", path.display()),
+                                            thread,
+                                            verbose,
+                                        ),
+                                        _ => logger.log_error(
+                                            format!("An unknown error occurred when trying to delete file {}", path.display()),
+                                            thread,
+                                            verbose
+                                        )
+                                    },
+                                }
+                            }
+
                             progress.inc(1);
                         } else {
                             logger.log_error(
-                                format!("Error is: {}", String::from_utf8_lossy(&output.stderr)),
+                                format!("Error processing file {}. Error is: {}", path.display(), String::from_utf8_lossy(&output.stderr)),
                                 thread,
                                 verbose,
                             );
+                            if cmd_args.delete {
+                                logger.log_info(
+                                    "Keeping the file due to the error above".to_string(),
+                                    thread,
+                                    verbose
+                                )
+                            }
                             logger.log_info(
                                 "Continuing with next task if there's more to do...".to_string(),
                                 thread,
