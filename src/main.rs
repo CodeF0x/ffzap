@@ -6,8 +6,9 @@ use crate::progress::Progress;
 use clap::Parser;
 use std::ffi::OsStr;
 use std::fs::create_dir_all;
+use std::io::ErrorKind;
 use std::path::Path;
-use std::process::{Command, Stdio};
+use std::process::{exit, Command, Stdio};
 use std::sync::{Arc, Mutex};
 use std::{fs, thread};
 
@@ -28,7 +29,7 @@ struct CmdArgs {
 
     /// path to a file containing paths to process. One path per line
     #[arg(long, required_unless_present = "input_directory", conflicts_with = "input_directory")]
-    paths_file: Option<String>,
+    input_file: Option<String>,
 
     /// if ffmpeg should overwrite files if they already exist. Default is false
     #[arg(long, default_value_t = false)]
@@ -58,14 +59,34 @@ fn main() {
     let cmd_args = CmdArgs::parse();
 
     let paths: Vec<String>;
-    if let Some(input_file_path) = cmd_args.paths_file {
-        paths = fs::read_to_string(&input_file_path)
-            .unwrap()
-            .trim()
-            .split('\n')
-            .into_iter()
-            .map(|s| s.trim().to_string())
-            .collect();
+    if let Some(input_file_path) = cmd_args.input_file {
+        paths = match fs::read_to_string(&input_file_path) {
+            Ok(contents) => contents
+                .trim()
+                .split('\n')
+                .map(|s| s.trim().to_string())
+                .collect(),
+            Err(err) => {
+                match err.kind() {
+                    ErrorKind::NotFound => {
+                        eprintln!("Not file found at {input_file_path}.");
+                        exit(1);
+                    }
+                    ErrorKind::PermissionDenied => {
+                        eprintln!("Permission denied when reading file {input_file_path}.");
+                        exit(1);
+                    }
+                    ErrorKind::InvalidData => {
+                        eprintln!("The contents of {input_file_path} contain invalid data. Please make sure it is encoded as UTF-8.");
+                        exit(1);
+                    }
+                    _ => {
+                        eprintln!("An error has occurred reading the file at path {input_file_path}: {:?}.", err);
+                        exit(1);
+                    }
+                }
+            }
+        }
     } else {
         paths = cmd_args.input_directory.unwrap();
     }
