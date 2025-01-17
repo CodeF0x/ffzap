@@ -39,8 +39,8 @@ struct CmdArgs {
     #[arg(long, default_value_t = false)]
     verbose: bool,
 
-    /// deletes the source file after it was successfully processed
-    #[arg(long, short, default_value_t = false)]
+    /// Delete the source file after it was successfully processed. If the process fails, the file is kept.
+    #[arg(long, default_value_t = false)]
     delete: bool,
 
     /// Specify the output file pattern. Use placeholders to customize file paths:
