@@ -12,7 +12,7 @@ impl Progress {
         let progress = multi.add(ProgressBar::new(length as u64));
         progress.set_style(
             ProgressStyle::default_bar()
-                .template("{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len}")
+                .template("{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} ({percent}%)")
                 .expect("Failed to set progress style")
                 .progress_chars("#>-"),
         );
