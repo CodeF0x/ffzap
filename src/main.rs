@@ -96,6 +96,7 @@ fn main() {
     }
 
     let paths = Arc::new(Mutex::new(paths));
+    let failed_paths: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(vec![]));
     let progress = Arc::new(Progress::new(paths.lock().unwrap().len()));
     let logger = Arc::new(Logger::new(Arc::clone(&progress)));
     let mut thread_handles = vec![];
@@ -104,6 +105,7 @@ fn main() {
 
     for thread in 0..cmd_args.thread_count {
         let paths = Arc::clone(&paths);
+        let failed_paths = Arc::clone(&failed_paths);
         let progress = Arc::clone(&progress);
         let logger = Arc::clone(&logger);
         let verbose = cmd_args.verbose;
@@ -231,6 +233,8 @@ fn main() {
                                 thread,
                                 verbose,
                             );
+
+                            failed_paths.lock().unwrap().push(path.display().to_string());
                         }
                     } else {
                         eprintln!("[THREAD {thread}] -- There was an error running ffmpeg. Please check if it's correctly installed and working as intended.");
@@ -258,4 +262,14 @@ fn main() {
         logger.get_log_path()
     );
     println!("{final_output}");
+
+    let failed_paths = failed_paths.lock().unwrap();
+
+    logger.append_failed_paths_to_log(&failed_paths);
+    if cmd_args.verbose && failed_paths.len() > 0 {
+        println!("\nThe following files were not processed due to the errors above:");
+        for path in failed_paths.iter() {
+            println!("{path}");
+        }
+    }
 }
