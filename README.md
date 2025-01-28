@@ -50,6 +50,63 @@ visit [ffmpeg's documentation](https://ffmpeg.org/ffmpeg.html).
 - (just for installing / building) a working installation of
   the [Rust programming language](https://www.rust-lang.org/tools/install)
 
+### Available options
+
+<details>
+  <summary>Click here to expand section</summary>
+
+  ```bash
+$ ffzap --help
+⚡ A multithreaded CLI for digital media processing using ffmpeg. If ffmpeg can do it, ffzap can do it - as many files in parallel as your system can handle.
+
+Usage: ffzap [OPTIONS] --ffmpeg-options <FFMPEG_OPTIONS> --output <OUTPUT>
+
+Options:
+  -t, --thread-count <THREAD_COUNT>
+          The amount of threads you want to utilize. most systems can handle 2. Go higher if you have a powerful computer. Default is 2. Can't be lower than 1
+
+          [default: 2]
+
+  -f, --ffmpeg-options <FFMPEG_OPTIONS>
+          Options you want to pass to ffmpeg. For the output file name, use --output
+
+  -i, --input-directory <INPUT_DIRECTORY>...
+          The files you want to process
+
+      --input-file <INPUT_FILE>
+          Path to a file containing paths to process. One path per line
+
+      --overwrite
+          If ffmpeg should overwrite files if they already exist. Default is false
+
+      --verbose
+          If verbose logs should be shown while ffzap is running
+
+      --delete
+          Delete the source file after it was successfully processed. If the process fails, the file is kept
+
+  -o, --output <OUTPUT>
+          Specify the output file pattern. Use placeholders to customize file paths:
+
+          {{dir}}  - Entire specified file path, e.g. ./path/to/file.txt -> ?./path/to/
+
+          {{name}} - Original file's name (without extension)
+
+          {{ext}}  - Original file's extension
+
+          Example: /destination/{{dir}}/{{name}}_transcoded.{{ext}}
+
+          Outputs the file in /destination, mirroring the original structure and keeping both the file extension and name, while adding _transcoded to the name.
+
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version
+```          
+
+</details>
+
 ### License
 
 You are free to:
