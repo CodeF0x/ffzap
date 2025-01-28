@@ -3,7 +3,7 @@ use std::fs;
 use std::fs::File;
 use std::io::Write;
 use std::path::{Display, PathBuf};
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, MutexGuard};
 
 pub(crate) struct Logger {
     progress: Arc<Progress>,
@@ -43,6 +43,20 @@ impl Logger {
         if print {
             self.print(line);
         }
+    }
+
+    pub(crate) fn append_failed_paths_to_log(&self, paths: &MutexGuard<Vec<String>>) {
+        if paths.len() == 0 {
+            return;
+        }
+
+        let static_line = "\nThe following files were not processed due to the errors above:";
+
+        let paths_lines = paths.join("\n");
+
+        let to_write = format!("{}\n{}", static_line, paths_lines);
+
+        self.write_to_log(&to_write);
     }
 
     pub(crate) fn get_log_path(&self) -> Display {
