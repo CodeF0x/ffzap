@@ -6,7 +6,26 @@ Because it uses ffmpeg under the hood, it supports any media file processing tha
 
 ### Installation
 
-To install ffzap, clone the repository and build the project:
+#### [Homebrew](https://brew.sh) (macOS / Linux)
+
+```bash
+brew tap CodeF0x/formulae
+brew install ffzap
+```
+
+For macOS, both x86_64 and aarch64 builds are provided. For Linux, only x86_64.
+
+#### [Cargo](https://doc.rust-lang.org/cargo/) (Universal -- 32bit and 64bit)
+
+(Install [Rust](https://www.rust-lang.org/tools/install) first if you haven't already)
+
+```bash
+cargo install ffzap
+```
+
+#### Building from source
+
+(Install [Rust](https://www.rust-lang.org/tools/install) first if you haven't already)
 
 ```bash
 git clone https://github.com/CodeF0x/ffzap
@@ -14,11 +33,11 @@ cd ffzap
 cargo build --release
 ```
 
-Alternatively, you can install it from [crates.io](https://crates.io).
+The ffzap executable will be under `target/release/`
 
-```bash
-cargo install ffzap
-```
+#### Or [Download](https://github.com/CodeF0x/ffzap/releases/latest) a prebuilt binary
+
+and add it to your path.
 
 ### Usage
 
@@ -47,7 +66,7 @@ visit [ffmpeg's documentation](https://ffmpeg.org/ffmpeg.html).
 ### Requirements
 
 - a working installation of [ffmpeg](https://ffmpeg.org/download.html)
-- (just for installing / building) a working installation of
+- (just for installing / building via Cargo) a working installation of
   the [Rust programming language](https://www.rust-lang.org/tools/install)
 
 ### Available options
