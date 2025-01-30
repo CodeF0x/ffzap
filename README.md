@@ -15,6 +15,14 @@ brew install ffzap
 
 For macOS, both x86_64 and aarch64 builds are provided. For Linux, only x86_64.
 
+#### [Winget](https://github.com/microsoft/winget-cli) (Windows 10 / 11)
+
+```bash
+winget install CodeF0x.ffzap
+```
+
+Only x86_64.
+
 #### [Cargo](https://doc.rust-lang.org/cargo/) (Universal -- 32bit and 64bit)
 
 (Install [Rust](https://www.rust-lang.org/tools/install) first if you haven't already)
@@ -22,6 +30,8 @@ For macOS, both x86_64 and aarch64 builds are provided. For Linux, only x86_64.
 ```bash
 cargo install ffzap
 ```
+
+Every architecture Rust has compile-targets for.
 
 #### Building from source
 
@@ -32,6 +42,8 @@ git clone https://github.com/CodeF0x/ffzap
 cd ffzap
 cargo build --release
 ```
+
+Every architecture Rust has compile-targets for.
 
 The ffzap executable will be under `target/release/`
 
