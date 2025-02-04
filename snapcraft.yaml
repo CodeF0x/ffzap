@@ -1,0 +1,158 @@
+name: ffzap
+version: 0.3.2
+summary: A multithreaded CLI for digital media processing using ffmpeg.
+description: |
+  ffzap ⚡ is a simple, fast command-line tool for processing media files with ffmpeg.
+  As it's multithreaded and can run as many tasks in parallel as your system can handle, 
+  it's perfect for converting, compressing, or editing audio and video files quickly and efficiently.
+
+  Because it uses ffmpeg under the hood, it supports any media file processing that ffmpeg can handle.
+
+confinement: strict
+base: core24
+
+parts:
+  ffzap:
+    plugin: rust
+    source: https://github.com/CodeF0x/ffzap.git
+    build-snaps:
+      - ffmpeg-2404-sdk
+    build-environment:
+      - PKG_CONFIG_PATH: /snap/ffmpeg-2404-sdk/current/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
+      - LD_LIBRARY_PATH: /snap/ffmpeg-2404-sdk/current/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+      - PATH: /snap/ffmpeg-2404-sdk/current/usr/bin${PATH:+:$PATH}
+    stage-packages:
+      # 🔹 Core FFmpeg Libraries
+      - libavcodec-dev
+      - libavformat-dev
+      - libavutil-dev
+      - libswscale-dev
+      - libswresample-dev
+      - libpostproc-dev
+      - libavfilter-dev
+      - libavdevice-dev
+
+      # 🔹 Video Codecs
+      - libx264-dev
+      - libx265-dev
+      - libaom-dev
+      - librav1e-dev
+      - libsvtav1-dev
+      - libvpx-dev
+      - libxvidcore-dev
+      - libopenh264-dev
+      - libxavs2-dev
+      - libtheora-dev
+
+      # 🔹 Audio Codecs
+      - libfdk-aac-dev
+      - libmp3lame-dev
+      - libopus-dev
+      - libvorbis-dev
+      - libtwolame-dev
+      - libspeex-dev
+      - libflac-dev
+      - libgsm1-dev
+      - libshine-dev
+      - libopencore-amrnb-dev
+      - libopencore-amrwb-dev
+      - libcodec2-dev
+
+      # 🔹 Hardware Acceleration
+      - intel-media-va-driver-non-free  # Intel QuickSync (QSV)
+      - libva-dev  # VAAPI
+      - libva-drm2
+      - libva-x11-2
+      - libmfx-dev  # Intel Media SDK
+      - libvpl-dev  # Intel Video Processing Library
+
+      # 🔹 Subtitle Processing
+      - libass-dev
+      - libtesseract-dev
+      - libaribb24-dev
+
+      # 🔹 Image Processing
+      - libjpeg-dev
+      - libpng-dev
+      - libwebp-dev
+      - libopenjp2-7-dev
+      - librsvg2-dev
+      - libjxl-dev  # JPEG XL
+
+      # 🔹 Streaming & Networking
+      - librtmp-dev
+      - libssh-dev
+      - libcurl4-openssl-dev
+      - libsmbclient-dev
+      - libchromaprint-dev
+
+      # 🔹 Audio & Video Filters
+      - libsoxr-dev
+      - librubberband-dev
+      - libvidstab-dev
+      - libzimg-dev
+
+      # 🔹 Additional Tools
+      - zlib1g-dev
+      - libssl-dev
+      - libxml2-dev
+      - libx11-dev
+      - libfreetype6-dev
+      - libfribidi-dev
+      - libharfbuzz-dev
+      - libfontconfig1-dev
+      - libzmq3-dev
+      - liblzma-dev
+      - libsndfile1-dev
+      - libglib2.0-dev
+      - libpango1.0-dev
+      - libgdk-pixbuf2.0-dev
+      - libwayland-dev
+      - libvdpau-dev
+
+    organize:
+      usr/lib/x86_64-linux-gnu/libva.so.2: usr/lib/libva.so.2
+      usr/lib/x86_64-linux-gnu/libva-drm.so.2: usr/lib/libva-drm.so.2
+      usr/lib/x86_64-linux-gnu/libva-x11.so.2: usr/lib/libva-x11.so.2
+
+platforms:
+  s390x:
+    build-on: [s390x]
+    build-for: [s390x]
+  ppc64el:
+    build-on: [ppc64el]
+    build-for: [ppc64el]
+  arm64:
+    build-on: [arm64]
+    build-for: [arm64]
+  armhf:
+    build-on: [armhf]
+    build-for: [armhf]
+  amd64:
+    build-on: [amd64]
+    build-for: [amd64]
+
+
+apps:
+  ffzap:
+    command: bin/ffzap
+    plugs:
+      - home  # Read/write in home (but not hidden folders)
+      - removable-media  # Access external drives
+      - hardware-observe  # Allow ffmpeg to use GPU acceleration
+      - cache-access  # Allow writing logs in ffzap cache dir
+      - ffmpeg-2404
+    environment:
+      LD_LIBRARY_PATH: $SNAP/ffmpeg-platform/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$LD_LIBRARY_PATH
+      PATH: $SNAP/ffmpeg-platform/usr/bin:$PATH
+
+plugs:
+  ffmpeg-2404: # name of the plug
+    interface: content # interface of snapcraft
+    target: ffmpeg-platform # mount point of the content snap
+    default-provider: ffmpeg-2404 # the default provider that'll provide this library
+
+  cache-access:
+    interface: personal-files
+    write:
+      - $HOME/.cache/ffzap
