@@ -4,9 +4,9 @@ files quickly and efficiently.
 
 Because it uses ffmpeg under the hood, it supports any media file processing that ffmpeg can handle.
 
-1. [Instalation](#installation)
+1. [Installation](#installation)
 2. [Usage](#usage)
-   - [Pratical examples](#more-practical-examples)
+   - [Practical examples](#more-practical-examples)
 3. [Requirements](#requirements)
 4. [All available options](#available-options)
 5. [License](#license)
