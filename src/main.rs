@@ -24,11 +24,19 @@ struct CmdArgs {
     ffmpeg_options: Option<String>,
 
     /// The files you want to process.
-    #[arg(short, long, num_args = 1.., required_unless_present = "input_file", conflicts_with = "input_file")]
+    #[arg(short, long, num_args = 1.., required_unless_present = "file_list", required_unless_present = "input_directory", required_unless_present = "input_file", conflicts_with = "file_list", conflicts_with = "input_directory", conflicts_with = "input_file")]
+    input: Option<Vec<String>>,
+
+    // DEPRECATED: and kept for showing an error if still used
+    #[arg(long, num_args = 1.., required_unless_present = "input", required_unless_present = "input_file", required_unless_present = "file_list", conflicts_with = "file_list", conflicts_with = "input", conflicts_with = "file_list", conflicts_with = "input_file", hide = true)]
     input_directory: Option<Vec<String>>,
 
     /// Path to a file containing paths to process. One path per line
-    #[arg(long, required_unless_present = "input_directory", conflicts_with = "input_directory")]
+    #[arg(long, required_unless_present = "input", required_unless_present = "input_directory", required_unless_present = "input_file", conflicts_with = "input", conflicts_with = "input_directory", conflicts_with = "input_file")]
+    file_list: Option<String>,
+
+    // DEPRECATED: kept for showing an error if still used
+    #[arg(long, required_unless_present = "input_directory", required_unless_present = "input", required_unless_present = "file_list", conflicts_with = "input_directory", conflicts_with = "input", conflicts_with = "file_list", hide = true)]
     input_file: Option<String>,
 
     /// If ffmpeg should overwrite files if they already exist. Default is false
@@ -62,8 +70,17 @@ struct CmdArgs {
 fn main() {
     let cmd_args = CmdArgs::parse();
 
+    if let Some(_) = cmd_args.input_directory {
+        eprintln!("Error: --input-directory is deprecated and will get removed in the next release. Use --input instead.");
+        exit(1);
+    }
+    if let Some(_) = cmd_args.input_file {
+        eprintln!("Error: --input-file is deprecated and will get removed in the next release. Use --file-list instead.");
+        exit(1);
+    }
+
     let paths: Vec<String>;
-    if let Some(input_file_path) = cmd_args.input_file {
+    if let Some(input_file_path) = cmd_args.file_list {
         paths = match fs::read_to_string(&input_file_path) {
             Ok(contents) => contents
                 .trim()
@@ -92,7 +109,7 @@ fn main() {
             }
         }
     } else {
-        paths = cmd_args.input_directory.unwrap();
+        paths = cmd_args.input.unwrap();
     }
 
     let paths = Arc::new(Mutex::new(paths));
