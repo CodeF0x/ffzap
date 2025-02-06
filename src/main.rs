@@ -32,11 +32,28 @@ struct CmdArgs {
     input_directory: Option<Vec<String>>,
 
     /// Path to a file containing paths to process. One path per line
-    #[arg(long, required_unless_present = "input", required_unless_present = "input_directory", required_unless_present = "input_file", conflicts_with = "input", conflicts_with = "input_directory", conflicts_with = "input_file")]
+    #[arg(
+        long,
+        required_unless_present = "input",
+        required_unless_present = "input_directory",
+        required_unless_present = "input_file",
+        conflicts_with = "input",
+        conflicts_with = "input_directory",
+        conflicts_with = "input_file"
+    )]
     file_list: Option<String>,
 
     // DEPRECATED: kept for showing an error if still used
-    #[arg(long, required_unless_present = "input_directory", required_unless_present = "input", required_unless_present = "file_list", conflicts_with = "input_directory", conflicts_with = "input", conflicts_with = "file_list", hide = true)]
+    #[arg(
+        long,
+        required_unless_present = "input_directory",
+        required_unless_present = "input",
+        required_unless_present = "file_list",
+        conflicts_with = "input_directory",
+        conflicts_with = "input",
+        conflicts_with = "file_list",
+        hide = true
+    )]
     input_file: Option<String>,
 
     /// If ffmpeg should overwrite files if they already exist. Default is false
@@ -150,9 +167,8 @@ fn main() {
                     logger.log_info(format!("Processing {}", path.display()), thread, verbose);
 
                     let split_options = match &ffmpeg_options {
-                        Some(options) => 
-                            options.split(' ').collect::<Vec<&str>>(),
-                        None => vec![]
+                        Some(options) => options.split(' ').collect::<Vec<&str>>(),
+                        None => vec![],
                     };
 
                     let mut final_file_name =
@@ -238,7 +254,11 @@ fn main() {
                             progress.inc(1);
                         } else {
                             logger.log_error(
-                                format!("Error processing file {}. Error is: {}", path.display(), String::from_utf8_lossy(&output.stderr)),
+                                format!(
+                                    "Error processing file {}. Error is: {}",
+                                    path.display(),
+                                    String::from_utf8_lossy(&output.stderr)
+                                ),
                                 thread,
                                 verbose,
                             );
@@ -246,7 +266,7 @@ fn main() {
                                 logger.log_info(
                                     "Keeping the file due to the error above".to_string(),
                                     thread,
-                                    verbose
+                                    verbose,
                                 )
                             }
                             logger.log_info(
@@ -255,7 +275,10 @@ fn main() {
                                 verbose,
                             );
 
-                            failed_paths.lock().unwrap().push(path.display().to_string());
+                            failed_paths
+                                .lock()
+                                .unwrap()
+                                .push(path.display().to_string());
                         }
                     } else {
                         eprintln!("[THREAD {thread}] -- There was an error running ffmpeg. Please check if it's correctly installed and working as intended.");
