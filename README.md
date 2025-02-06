@@ -9,7 +9,8 @@ Because it uses ffmpeg under the hood, it supports any media file processing tha
    - [Practical examples](#more-practical-examples)
 3. [Requirements](#requirements)
 4. [All available options](#available-options)
-5. [License](#license)
+5. [Migrating to 1.0.0](#migrating-to-100)
+6. [License](#license)
 
 ### Installation
 
@@ -194,21 +195,21 @@ Keypoints:
 $ ffzap --help
 ⚡ A multithreaded CLI for digital media processing using ffmpeg. If ffmpeg can do it, ffzap can do it - as many files in parallel as your system can handle.
 
-Usage: ffzap [OPTIONS] --ffmpeg-options <FFMPEG_OPTIONS> --output <OUTPUT>
+Usage: ffzap [OPTIONS] --output <OUTPUT>
 
 Options:
   -t, --thread-count <THREAD_COUNT>
           The amount of threads you want to utilize. most systems can handle 2. Go higher if you have a powerful computer. Default is 2. Can't be lower than 1
-
+          
           [default: 2]
 
   -f, --ffmpeg-options <FFMPEG_OPTIONS>
           Options you want to pass to ffmpeg. For the output file name, use --output
 
-  -i, --input-directory <INPUT_DIRECTORY>...
+  -i, --input <INPUT>...
           The files you want to process
 
-      --input-file <INPUT_FILE>
+      --file-list <FILE_LIST>
           Path to a file containing paths to process. One path per line
 
       --overwrite
@@ -222,15 +223,15 @@ Options:
 
   -o, --output <OUTPUT>
           Specify the output file pattern. Use placeholders to customize file paths:
-
+          
           {{dir}}  - Entire specified file path, e.g. ./path/to/file.txt -> ?./path/to/
-
+          
           {{name}} - Original file's name (without extension)
-
+          
           {{ext}}  - Original file's extension
-
+          
           Example: /destination/{{dir}}/{{name}}_transcoded.{{ext}}
-
+          
           Outputs the file in /destination, mirroring the original structure and keeping both the file extension and name, while adding _transcoded to the name.
 
   -h, --help
@@ -241,6 +242,37 @@ Options:
 ```          
 
 </details>
+
+
+### Migrating to 1.0.0
+
+In version `1.0.0`, the following changes were made:
+
+- `--input-directory` has been deprecated and replaced by `--input`.
+- `--input-file` has been deprecated and replaced by `--file-list`.
+
+#### 1. Replacing `--input-directory` with `--input`:
+
+Instead of using `--input-directory`, you now have to use `--input` to specify the files you want to process:
+
+```bash
+ffzap --input <files here> -f "<options here>" -o "<output pattern here>"
+```
+
+**Note:** The short form `-i` remains unaffected by this change.
+
+#### 2. Replacing `--input-file` with `--file-list`:
+
+Instead of `--input-file`, use `--file-list` to specify a file containing a list of files to process:
+
+```bash
+ffzap --file-list <path to list here> -f "<options here>" -o "<output pattern here>"
+```
+
+---
+
+For further details and motivation behind these changes, refer to [issue 16](https://github.com/CodeF0x/ffzap/issues/16).
+
 
 ### License
 
