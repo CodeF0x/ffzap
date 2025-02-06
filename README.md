@@ -159,6 +159,26 @@ Keypoints:
 
 </details>
 
+---
+
+<details>
+<summary>Swap video containers</summary>
+
+```bash
+ffzap --input-file files.txt -o "{{name}}.mkv" -t 2
+```
+
+(It is assumed the source files have a container that's interchangable with MKV)
+
+Keypoints:
+- use `--input-file` to pass a list of file names to process
+- `-o "{{name}}.<desired file extension>` to swap all files to the desired container format (in this case MKV)
+- No `-f` because it's not needed
+- `-t 2` processes two files in parallel
+  - adjust this number according to your system specs. Two should be good on most modern systems
+
+</details>
+
 ### Requirements
 
 - a working installation of [ffmpeg](https://ffmpeg.org/download.html)
