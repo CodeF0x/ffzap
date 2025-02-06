@@ -21,7 +21,7 @@ struct CmdArgs {
 
     /// Options you want to pass to ffmpeg. For the output file name, use --output
     #[arg(short, long, allow_hyphen_values = true)]
-    ffmpeg_options: String,
+    ffmpeg_options: Option<String>,
 
     /// The files you want to process.
     #[arg(short, long, num_args = 1.., required_unless_present = "input_file", conflicts_with = "input_file")]
@@ -132,7 +132,11 @@ fn main() {
 
                     logger.log_info(format!("Processing {}", path.display()), thread, verbose);
 
-                    let split_options = &mut ffmpeg_options.split(' ').collect::<Vec<&str>>();
+                    let split_options = match &ffmpeg_options {
+                        Some(options) => 
+                            options.split(' ').collect::<Vec<&str>>(),
+                        None => vec![]
+                    };
 
                     let mut final_file_name =
                         output.replace("{{ext}}", path.extension().unwrap().to_str().unwrap());
