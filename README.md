@@ -89,11 +89,11 @@ visit [ffmpeg's documentation](https://ffmpeg.org/ffmpeg.html).
 <summary>Re-encode multiple videos to H265 and the audio to opus</summary>
 
 ```bash
-ffzap --input-file files.txt -f "-c:v libx265 -preset medium -crf 23 -c:a libopus -b:a 128k" -o "Output/{{name}}.mp4" -t 2
+ffzap --file-list files.txt -f "-c:v libx265 -preset medium -crf 23 -c:a libopus -b:a 128k" -o "Output/{{name}}.mp4" -t 2
 ```
 
 Keypoints:
-- use `--input-file` to pass a list of file names to process
+- use `--file-list` to pass a list of file names to process
 - re-encode the video to H265 using `-c:v libx265`
   - `-preset medium` to balance out speed and file size
   - `-crf 23` to achieve good quality with reasonable file size
@@ -110,11 +110,11 @@ Keypoints:
 <summary>Convert PNG images to JPG</summary>
 
 ```bash
-ffzap --input-file files.txt -f "-c:v mjpeg -q:v 2" -o "Output/{{name}}.jpg" -t 6
+ffzap --file-list files.txt -f "-c:v mjpeg -q:v 2" -o "Output/{{name}}.jpg" -t 6
 ```
 
 Keypoints:
-- use `--input-file` to pass a list of file names to process
+- use `--file-list` to pass a list of file names to process
 - convert the image to JPG using `-c:v mjpeg`
   - `-q:v 2` to set very high quality
 - `-t 6` runs six processes in parallel, converting six files at once
@@ -128,12 +128,12 @@ Keypoints:
 <summary>Add a watermark to multiple videos</summary>
 
 ```bash
-ffzap --input-file files.txt -f "-i watermark.png -filter_complex [1]format=rgba,lut=a=val*0.3[watermark];[0][watermark]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2 -c:a copy" -o "{{name}}_watermark.mp4" -t 2
+ffzap --file-list files.txt -f "-i watermark.png -filter_complex [1]format=rgba,lut=a=val*0.3[watermark];[0][watermark]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2 -c:a copy" -o "{{name}}_watermark.mp4" -t 2
 ```
 (Note that this command may not work in Windows Powershell as it requires a different escaping format)
 
 Keypoints:
-- use `--input-file` to pass a list of file names to process (these are the files the watermark gets added to)
+- use `--file-list` to pass a list of file names to process (these are the files the watermark gets added to)
 - select to watermark file with `-i watermark.png` **inside** `-f`
 - `-filter_complex` applies the watermark with 70% opacity to the center of each video
 - `-c:a copy` copies the audio
@@ -148,11 +148,11 @@ Keypoints:
 <summary>Resize multiple videos</summary>
 
 ```bash
-ffzap --input-file files.txt -f "-vf scale=1280:720 -c:a copy" -o "{{name}}_resized.mp4" -t 2
+ffzap --file-list files.txt -f "-vf scale=1280:720 -c:a copy" -o "{{name}}_resized.mp4" -t 2
 ```
 
 Keypoints:
-- use `--input-file` to pass a list of file names to process
+- use `--file-list` to pass a list of file names to process
 - `-vf scale=1280:720` sets the video resolution to HD
 - `-c:a copy` copies the audio
 - `-t 2` processes two files in parallel
@@ -166,13 +166,13 @@ Keypoints:
 <summary>Swap video containers</summary>
 
 ```bash
-ffzap --input-file files.txt -o "{{name}}.mkv" -t 2
+ffzap --file-list files.txt -o "{{name}}.mkv" -t 2
 ```
 
 (It is assumed the source files have a container that's interchangable with MKV)
 
 Keypoints:
-- use `--input-file` to pass a list of file names to process
+- use `--file-list` to pass a list of file names to process
 - `-o "{{name}}.<desired file extension>` to swap all files to the desired container format (in this case MKV)
 - No `-f` because it's not needed
 - `-t 2` processes two files in parallel
