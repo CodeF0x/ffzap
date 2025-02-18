@@ -7,10 +7,11 @@ Because it uses ffmpeg under the hood, it supports any media file processing tha
 1. [Installation](#installation)
 2. [Usage](#usage)
    - [Practical examples](#more-practical-examples)
-3. [Requirements](#requirements)
-4. [All available options](#available-options)
-5. [Migrating to 1.0.0](#migrating-to-100)
-6. [License](#license)
+3. [Speed comparison to alternatives](#speed-comparison-to-commonly-used-alternatives-based-on-github-stars)
+4. [Requirements](#requirements)
+5. [All available options](#available-options)
+6. [Migrating to 1.0.0](#migrating-to-100)
+7. [License](#license)
 
 ### Installation
 
@@ -169,7 +170,7 @@ Keypoints:
 ffzap --file-list files.txt -o "{{name}}.mkv" -t 2
 ```
 
-(It is assumed the source files have a container that's interchangable with MKV)
+(It is assumed the source files have a container that's interchangeable with MKV)
 
 Keypoints:
 - use `--file-list` to pass a list of file names to process
@@ -179,6 +180,58 @@ Keypoints:
   - adjust this number according to your system specs. Two should be good on most modern systems
 
 </details>
+
+### Speed comparison to commonly used alternatives (based on GitHub stars)
+
+Preface: I want to point out that with this comparison, I am not saying the mentioned tools are bad or inferior to ffzap. They're achieving a great job and are used by many.
+My personal issue with these tools is that I think they don't use system resources efficiently / don't allow the user to take control and this test aims to show that.
+
+ffzap is not a magical tool that speeds up your batch encoding processes by simply increasing the amount of ffmpeg instances.
+You need to be aware of what your system can and can't do and then leverage ffzap to take advantage of that.
+
+---
+
+Test system:
+- Intel Core i7 13700K
+- RTX 3090
+- 32 GB RAM
+- NVMe SSD
+
+Test Videos (29):
+- 1440p
+- 60 FPS
+- H264
+- AAC / 192k
+
+Re-Encoding settings:
+- Video:
+  - Codec: H265
+  - Quality: CRF 24
+  - Preset: medium
+  - Resolution: 1080p
+- Audio:
+  - Copy
+
+Used ffzap command:
+```bash
+ffzap -i Videos/**/*.mp4 -f "-c:v libx265 -crf 24 -preset medium -vf scale=1920:1080 -c:a copy" -o "Out/{{name}}.mp4" -t 2
+```
+
+In this example, we're comparing ffzap to other tools on how they utilize the system's CPU when re-encoding a video. An i7 13700K can run two parallel 1080p encodings comfortably when limited to 12 threads per ffmpeg instance, and we achieve that by using `-t 2` (`--threads 2`) in ffzap. This of course
+slows down each individual process, but because we're running two jobs at once, it makes up for it.
+
+All other mentioned tools (except FFBatch AV Converter) run only one encoding job at any given time, resulting in the following total encoding times:
+
+| Software             | Version | Total Processing Time | Available Builds      | Gui | CLI |
+|----------------------|---------|-----------------------|-----------------------|-----|-----|
+| ffzap                | 1.0.0   | 00:32:16 (100%)       | Windows, Linux, macOS | No  | Yes |
+| Handbrake            | 1.9.0   | 00:48:13 (149.5%)     | Windows, Linux, macOS | Yes | Yes |
+| StaxRip              | 2.44.4  | 01:43:26 (320.5%)     | Windows               | Yes | Yes |
+| FFBatch AV Converter | 3.2.1   | 00:30:44 (95.2%)      | Windows, Linux (Wine) | Yes | No  |
+
+ffzap and FFBatch AV Converter are the clear winners here. Given the small difference in total encoding time between the two,
+ffzap could just be as fast if not even faster if I would invest more time in finding the sweetspot between ffmpeg instances and threads per instance.
+For the sake of simplicity for this example I didn't to that.
 
 ### Requirements
 
