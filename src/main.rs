@@ -68,6 +68,10 @@ struct CmdArgs {
     #[arg(long, default_value_t = false)]
     delete: bool,
 
+    /// Displays the current eta in the progressbar
+    #[arg(long, default_value_t = false)]
+    eta: bool,
+
     /// Specify the output file pattern. Use placeholders to customize file paths:
     ///
     /// {{dir}}  - Entire specified file path, e.g. ./path/to/file.txt -> ?./path/to/
@@ -86,6 +90,11 @@ struct CmdArgs {
 
 fn main() {
     let cmd_args = CmdArgs::parse();
+
+    if cmd_args.eta {
+        println!("Warning: ETA is a highly experimental feature and prone to absurd estimations. If your encoding process has long pauses in-between each processed file, you WILL experience incredibly inaccurate estimations!");
+        println!("This is due to unwanted behaviour in one of ffzap's dependencies and cannot be fixed by ffzap.");
+    }
 
     if let Some(_) = cmd_args.input_directory {
         eprintln!("Error: --input-directory is deprecated and will get removed in the next release. Use --input instead.");
@@ -131,11 +140,11 @@ fn main() {
 
     let paths = Arc::new(Mutex::new(paths));
     let failed_paths: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(vec![]));
-    let progress = Arc::new(Progress::new(paths.lock().unwrap().len()));
+    let progress = Arc::new(Progress::new(paths.lock().unwrap().len(), cmd_args.eta));
     let logger = Arc::new(Logger::new(Arc::clone(&progress)));
     let mut thread_handles = vec![];
 
-    progress.start_stick(500);
+    progress.start_stick(1000);
 
     for thread in 0..cmd_args.thread_count {
         let paths = Arc::clone(&paths);
