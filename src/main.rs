@@ -93,6 +93,10 @@ fn main() {
                         eprintln!("The contents of {input_file_path} contain invalid data. Please make sure it is encoded as UTF-8.");
                         exit(1);
                     }
+                    ErrorKind::IsADirectory => {
+                        eprintln!("The path {input_file_path} is a directory.");
+                        exit(1);
+                    }
                     _ => {
                         eprintln!("An error has occurred reading the file at path {input_file_path}: {:?}.", err);
                         exit(1);
