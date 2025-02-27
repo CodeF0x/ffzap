@@ -1,0 +1,97 @@
+name: Build on Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: macos-15
+            arch: aarch64
+            artifact_name: ffzap-macos-aarch64.tar.gz
+            target: aarch64-apple-darwin
+
+          - os: macos-15
+            arch: x86_64
+            artifact_name: ffzap-macos-x86_64.tar.gz
+            target: x86_64-apple-darwin
+
+          - os: ubuntu-latest
+            arch: x86_64
+            artifact_name: ffzap-linux-x86_64.tar.gz
+            target: x86_64-unknown-linux-gnu
+
+          - os: windows-latest
+            arch: x86_64
+            artifact_name: ffzap.exe
+            target: x86_64-pc-windows-msvc
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          target: ${{ matrix.target }}
+
+      - name: Build project
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Prepare archive
+        run: |
+          cd target/${{ matrix.target }}/release
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            mv ffzap.exe ../../..
+          else
+            tar -czvf ../../../${{ matrix.artifact_name }} ffzap
+          fi
+        shell: bash
+
+      - name: Compute SHA256 hash
+        run: |
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            certutil -hashfile ffzap.exe SHA256 | tail -2 | head -1 > ffzap.exe.sha256
+          elif [ "${{ runner.os }}" == "macOS" ]; then
+            shasum -a 256 ${{ matrix.artifact_name }} > ${{ matrix.artifact_name }}.sha256
+          else
+            sha256sum ${{ matrix.artifact_name }} > ${{ matrix.artifact_name }}.sha256
+          fi
+        shell: bash
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.os }}-${{ matrix.arch }}
+          path: |
+            ffzap.exe
+            ffzap.exe.sha256
+            ${{ matrix.artifact_name }}
+            ${{ matrix.artifact_name }}.sha256
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Update latest release
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            **/*.exe
+            **/*.tar.gz
+            **/*.sha256
+          tag_name: ${{ github.event.release.tag_name }}
+          draft: false
+          prerelease: false
+          append_body: true
