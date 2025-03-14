@@ -11,6 +11,7 @@ use std::path::Path;
 use std::process::{exit, Command, Stdio};
 use std::sync::{Arc, Mutex};
 use std::{fs, thread};
+use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 
 #[derive(Parser, Debug, Clone)]
 #[command(version, about)]
@@ -24,11 +25,11 @@ struct CmdArgs {
     ffmpeg_options: Option<String>,
 
     /// The files you want to process.
-    #[arg(short, long, num_args = 1.., required_unless_present = "file_list", conflicts_with = "file_list")]
+    #[arg(short, long, num_args = 1.., required_unless_present = "file_list", conflicts_with = "file_list", required_unless_present = "gui")]
     input: Option<Vec<String>>,
 
     /// Path to a file containing paths to process. One path per line
-    #[arg(long, required_unless_present = "input", conflicts_with = "input")]
+    #[arg(long, required_unless_present = "input", conflicts_with = "input", required_unless_present = "gui")]
     file_list: Option<String>,
 
     /// If ffmpeg should overwrite files if they already exist. Default is false
@@ -47,6 +48,10 @@ struct CmdArgs {
     #[arg(long, default_value_t = false)]
     eta: bool,
 
+    /// Starts GUI if present
+    #[arg(long, default_value_t = false)]
+    gui: bool,
+
     /// Specify the output file pattern. Use placeholders to customize file paths:
     ///
     /// {{dir}}  - Entire specified file path, e.g. ./path/to/file.txt -> ?./path/to/
@@ -58,13 +63,29 @@ struct CmdArgs {
     /// Example: /destination/{{dir}}/{{name}}_transcoded.{{ext}}
     ///
     /// Outputs the file in /destination, mirroring the original structure and keeping both the file extension and name, while adding _transcoded to the name.
-    #[arg(short, long)]
-    output: String,
+    #[arg(short, long, required_unless_present = "gui")]
+    output: Option<String>,
     // {{ext}} -> extension, {{name}} filename without extension, {{dir}} -> directory structure from starting point to file, {{parent}} -> parent directory of starting point
 }
 
-fn main() {
+const HTML: &str = include_str!("../gui/index.html");
+
+async fn serve_html() -> impl Responder {
+    HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(HTML)
+}
+
+#[tokio::main]
+async fn main() {
     let cmd_args = CmdArgs::parse();
+
+    if cmd_args.gui {
+        HttpServer::new(|| App::new().route("/", web::get().to(serve_html)))
+            .bind("127.0.0.1:8080").expect("Could not bind port 8080")
+            .run()
+            .await.expect("Server crashed");
+    }
 
     if cmd_args.eta {
         println!("Warning: ETA is a highly experimental feature and prone to absurd estimations. If your encoding process has long pauses in-between each processed file, you WILL experience incredibly inaccurate estimations!");
@@ -123,7 +144,7 @@ fn main() {
         let logger = Arc::clone(&logger);
         let verbose = cmd_args.verbose;
         let ffmpeg_options = cmd_args.ffmpeg_options.clone();
-        let output = cmd_args.output.clone();
+        let output = cmd_args.output.clone().unwrap();
 
         let handle = thread::spawn(move || loop {
             let path_to_process = {
@@ -149,7 +170,8 @@ fn main() {
                         Some(options) => options.split(' ').collect::<Vec<&str>>(),
                         None => vec![],
                     };
-
+                    
+                    
                     let mut final_file_name =
                         output.replace("{{ext}}", path.extension().unwrap().to_str().unwrap());
                     final_file_name = final_file_name
