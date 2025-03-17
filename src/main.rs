@@ -82,7 +82,7 @@ fn main() {
             Err(err) => {
                 match err.kind() {
                     ErrorKind::NotFound => {
-                        eprintln!("Not file found at {input_file_path}.");
+                        eprintln!("No file found at {input_file_path}.");
                         exit(1);
                     }
                     ErrorKind::PermissionDenied => {
