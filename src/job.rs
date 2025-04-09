@@ -2,7 +2,6 @@ use crate::logger::Logger;
 use crate::progress::Progress;
 use clap::Parser;
 use std::ffi::OsStr;
-use std::fmt::Pointer;
 use std::fs::{create_dir_all, remove_file};
 use std::io::ErrorKind;
 use std::path::Path;
@@ -155,8 +154,9 @@ pub(crate) fn run_job(cmd_args: CmdArgs) {
                         None => vec![],
                     };
 
-                    println!("{}", output.clone().unwrap());
-                    let output = output.clone().unwrap_or(String::from(""));
+                    // Must be present at this point. --gui is the only option that makes --output obsolete
+                    // and if --gui is present, the user is required to input an output pattern
+                    let output = output.clone().unwrap();
 
                     let mut final_file_name =
                         output.replace("{{ext}}", path.extension().unwrap().to_str().unwrap());
@@ -176,7 +176,7 @@ pub(crate) fn run_job(cmd_args: CmdArgs) {
                             .to_str()
                             .unwrap_or(""),
                     );
-                    println!("{final_file_name}");
+                    println!("DEBUG {final_file_name}");
 
                     if Path::new(&final_file_name).exists() && !cmd_args.overwrite {
                         logger.log_error(
@@ -187,7 +187,6 @@ pub(crate) fn run_job(cmd_args: CmdArgs) {
                         failed_paths.lock().unwrap().push(final_file_name);
                         break;
                     }
-
                     let final_path_parent = Path::new(&final_file_name).parent().unwrap();
 
                     if !final_path_parent.exists() {
