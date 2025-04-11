@@ -176,7 +176,6 @@ pub(crate) fn run_job(cmd_args: CmdArgs) {
                             .to_str()
                             .unwrap_or(""),
                     );
-                    println!("DEBUG {final_file_name}");
                     let final_path_parent = Path::new(&final_file_name).parent().unwrap();
 
                     if !final_path_parent.exists() {
@@ -200,15 +199,6 @@ pub(crate) fn run_job(cmd_args: CmdArgs) {
                         true => "-y",
                         false => "-n",
                     };
-
-                    println!(
-                        "{:?}",
-                        Command::new("ffmpeg")
-                            .args(["-i", path.to_str().unwrap()])
-                            .args(split_options.clone())
-                            .arg(&final_file_name)
-                            .arg(overwrite)
-                    );
 
                     if let Ok(output) = Command::new("ffmpeg")
                         .args(["-i", path.to_str().unwrap()])
