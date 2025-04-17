@@ -168,6 +168,17 @@ fn main() {
                             .to_str()
                             .unwrap_or(""),
                     );
+
+                    if Path::new(&final_file_name).exists() && !cmd_args.overwrite {
+                        logger.log_error(
+                            format!("File {final_file_name} already exists and --overwrite is set to false. Continuing with next task if there is more to do..."),
+                            thread,
+                            verbose
+                        );
+                        failed_paths.lock().unwrap().push(final_file_name);
+                        break;
+                    }
+
                     let final_path_parent = Path::new(&final_file_name).parent().unwrap();
 
                     if !final_path_parent.exists() {
@@ -187,20 +198,18 @@ fn main() {
                         }
                     }
 
-                    let overwrite = match cmd_args.overwrite {
-                        true => "-y",
-                        false => "-n",
-                    };
+                    let mut command = Command::new("ffmpeg");
+                    command.arg("-i").arg(path.to_str().unwrap());
+                    command.args(split_options);
+                    command.arg(&final_file_name);
+                    command.stdout(Stdio::null());
+                    command.stderr(Stdio::piped());
 
-                    if let Ok(output) = Command::new("ffmpeg")
-                        .args(["-i", path.to_str().unwrap()])
-                        .args(split_options)
-                        .arg(&final_file_name)
-                        .arg(overwrite)
-                        .stdout(Stdio::null())
-                        .stderr(Stdio::piped())
-                        .output()
-                    {
+                    if cmd_args.overwrite {
+                        command.arg("-y");
+                    }
+
+                    if let Ok(output) = command.output() {
                         if output.status.success() {
                             logger.log_info(
                                 format!("Success, saving to {final_file_name}"),
