@@ -4,8 +4,8 @@ mod progress;
 
 use crate::job::CmdArgs;
 use clap::Parser;
-use iced::widget::{button, column, text_editor, text_input, Column, checkbox};
-use iced_aw::widget::{number_input};
+use iced::widget::{button, checkbox, column, row, text_editor, text_input, Column};
+use iced_aw::widget::number_input;
 use std::thread;
 
 #[derive(Debug, Clone)]
@@ -33,35 +33,41 @@ struct Gui {
 
 impl Gui {
     pub fn view(&self) -> Column<Message> {
-        let mut input_files = text_input("Enter the file paths of the files you want to process, seperated by space",&self.input_files);
+        let mut input_files = text_input(
+            "Enter the file paths of the files you want to process, seperated by space",
+            &self.input_files,
+        );
         let mut file_list = text_input("Enter path to file list", &self.file_list);
-        
+
         let ffmpeg_options = text_editor(&self.ffmpeg_options)
             .placeholder("Enter the ffmpeg_options you want to process")
             .on_action(Message::EditFfmpegOption);
-        
+
         let output_pattern = text_input("Enter your output pattern", &self.output_pattern)
             .on_input(Message::EditOutputPattern);
-        
-        let thread_input = number_input(&self.threads, 1..=u16::MAX, Message::EditThreadAmount).on_input(Message::EditThreadAmount);
-        let delete = checkbox("Delete source files after job successfully finished", self.delete).on_toggle(Message::ToggleDelete);
-        let overwrite = checkbox("Overwrite target if it already exists", self.overwrite).on_toggle(Message::ToggleOverwrite);
-        
+
+        let thread_input = number_input(&self.threads, 1..=u16::MAX, Message::EditThreadAmount)
+            .on_input(Message::EditThreadAmount);
+        let delete = checkbox(
+            "Delete source files after job successfully finished",
+            self.delete,
+        )
+        .on_toggle(Message::ToggleDelete);
+        let overwrite = checkbox("Overwrite target if it already exists", self.overwrite)
+            .on_toggle(Message::ToggleOverwrite);
+
         if self.input_files.is_empty() {
             file_list = file_list.on_input(Message::EditFileList);
         }
         if self.file_list.is_empty() {
             input_files = input_files.on_input(Message::EditInputFiles);
         }
-        
+
         column![
-            input_files,
-            file_list,
+            row![input_files, file_list,],
             ffmpeg_options,
             output_pattern,
-            thread_input,
-            delete,
-            overwrite,
+            row![thread_input, delete, overwrite],
             button("Start").on_press(Message::Start),
         ]
     }
@@ -133,7 +139,7 @@ impl Gui {
             }
         }
     }
-    
+
     fn default_helper() -> Self {
         Gui {
             input_files: Default::default(),

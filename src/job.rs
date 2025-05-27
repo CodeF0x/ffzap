@@ -176,7 +176,6 @@ pub(crate) fn run_job(cmd_args: CmdArgs) {
                             .to_str()
                             .unwrap_or(""),
                     );
-                    println!("DEBUG {final_file_name}");
 
                     if Path::new(&final_file_name).exists() && !cmd_args.overwrite {
                         logger.log_error(
@@ -205,20 +204,6 @@ pub(crate) fn run_job(cmd_args: CmdArgs) {
                             }
                         }
                     }
-
-                    let overwrite = match cmd_args.overwrite {
-                        true => "-y",
-                        false => "-n",
-                    };
-
-                    println!(
-                        "{:?}",
-                        Command::new("ffmpeg")
-                            .args(["-i", path.to_str().unwrap()])
-                            .args(split_options.clone())
-                            .arg(&final_file_name)
-                            .arg(overwrite)
-                    );
 
                     let mut command = Command::new("ffmpeg");
                     command.arg("-i").arg(path.to_str().unwrap());
