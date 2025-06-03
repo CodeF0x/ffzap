@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ffzap</title>
+  <style>
+    body {
+      background-color: #0e0e0e;
+      color: #f5f5f5;
+      font-family: monospace, sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .ascii-box {
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 2rem 0;
+      overflow-x: auto;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    .ascii-box pre {
+      white-space: pre;
+      font-size: 0.9rem;
+    }
+
+    .buttons {
+      margin-top: 1.5rem;
+    }
+
+    .button {
+      display: inline-block;
+      margin: 0 0.5rem;
+      padding: 0.6rem 1.2rem;
+      background-color: #1f1f1f;
+      color: #fff;
+      border: 1px solid #444;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+
+    .button:hover {
+      background-color: #333;
+    }
+
+    video {
+      max-width: 40%;
+      max-height: 40%;
+      border: 1px solid #333;
+      border-radius: 8px;
+    }
+
+    section {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      justify-content: space-evenly;
+    }
+
+    #examples {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      justify-content: center;
+    }
+
+    #download {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  </style>
+</head>
+
+<body>
+  <section>
+    <div class="ascii-box">
+      <pre>
+    /$$$$$$   /$$$$$$                              
+   /$$__  $$ /$$__  $$                             
+  | $$  \__/| $$  \__//$$$$$$$$  /$$$$$$   /$$$$$$ 
+  | $$$$    | $$$$   |____ /$$/ |____  $$ /$$__  $$
+  | $$_/    | $$_/      /$$$$/   /$$$$$$$| $$  \ $$
+  | $$      | $$       /$$__/   /$$__  $$| $$  | $$
+  | $$      | $$      /$$$$$$$$|  $$$$$$$| $$$$$$$/
+  |__/      |__/     |________/ \_______/| $$____/ 
+                                         | $$      
+                                         | $$      
+                                         |__/       
+      </pre>
+    </div>
+    <p>A blazing fast & convenient CLI for batch media processing using FFmpeg with parallel execution.</p>
+
+    <video controls loop muted>
+      <source src="demo.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+
+    <div class="buttons">
+      <a href="#examples" class="button">Examples</a>
+      <a href="#download" class="button">Install</a>
+    </div>
+  </section>
+  <section id="examples">
+    <span>Re-encode two videos in parallel in H265</span>
+    <pre
+      class="ascii-box">$ ffzap --file-list files.txt -f "-c:v libx265 -preset medium -crf 23 -c:a libopus -b:a 128k" -o "Output/{{name}}.mp4" -t 2</pre>
+    <span>Convert six PNGs to JPG in parallel</span>
+    <pre class="ascii-box">$ ffzap --file-list files.txt -f "-c:v mjpeg -q:v 2" -o "Output/{{name}}.jpg" -t 6</pre>
+    <span>Add a watermark to two videos in parallel</span>
+    <pre
+      class="ascii-box">$ ffzap --file-list files.txt -f "-i watermark.png -filter_complex [1]format=rgba,lut=a=val*0.3[watermark];[0][watermark]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2 -c:a copy" -o "{{name}}_watermark.mp4" -t 2</pre>
+    <span>Re-size two videos to 720p in parallel</span>
+    <pre
+      class="ascii-box">$ ffzap --file-list files.txt -f "-vf scale=1280:720 -c:a copy" -o "{{name}}_resized.mp4" -t 2</pre>
+    <span>Remux two videos to MKV in parallel</span>
+    <pre class="ascii-box">$ ffzap --file-list files.txt -o "{{name}}.mkv" -t 2</pre>
+  </section>
+  <section id="download">
+    <pre class="ascii-box">$ brew tap CodeF0x/formulae<br>$ brew install ffzap</pre>
+    <pre class="ascii-box">$ winget install CodeF0x.ffzap</pre>
+    <pre class="ascii-box">$ cargo install ffzap</pre>
+    <p>Or download from <a href="https://github.com/CodeF0x/ffzap/releases/latest/">GitHub</a></p>
+  </section>
+</body>
+
+</html>
