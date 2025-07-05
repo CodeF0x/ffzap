@@ -43,7 +43,7 @@ jobs:
           target: ${{ matrix.target }}
 
       - name: Build project
-        run: cargo build --release --target ${{ matrix.target }}
+        run: cargo build --bin ffzap --release --target ${{ matrix.target }}
 
       - name: Prepare archive
         run: |

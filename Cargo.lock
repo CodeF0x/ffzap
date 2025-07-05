@@ -209,10 +209,25 @@ checksum = "a357d28ed41a50f9c765dbfe56cbc04a64e53e5fc58ba79fbc34c10ef3df831f"
 name = "ffzap"
 version = "1.1.2"
 dependencies = [
+ "clap",
+ "ffzap-shared",
+]
+
+[[package]]
+name = "ffzap-shared"
+version = "1.1.2"
+dependencies = [
  "chrono",
  "clap",
  "dirs",
  "indicatif",
+]
+
+[[package]]
+name = "ffzap-ui"
+version = "1.1.2"
+dependencies = [
+ "ffzap-shared",
 ]
 
 [[package]]
