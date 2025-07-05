@@ -5,14 +5,14 @@ use std::io::Write;
 use std::path::{Display, PathBuf};
 use std::sync::{Arc, Mutex, MutexGuard};
 
-pub(crate) struct Logger {
+pub struct Logger {
     progress: Arc<Progress>,
     log_file: Arc<Mutex<File>>,
     log_path: PathBuf,
 }
 
 impl Logger {
-    pub(crate) fn new(progress: Arc<Progress>) -> Self {
+    pub fn new(progress: Arc<Progress>) -> Self {
         let path_file_tuple = Self::setup_log_dir_and_create_log_file();
 
         let log_path = path_file_tuple.0;
@@ -25,7 +25,7 @@ impl Logger {
         }
     }
 
-    pub(crate) fn log_info(&self, line: String, thread: u16, print: bool) {
+    pub fn log_info(&self, line: String, thread: u16, print: bool) {
         let line = format!("[INFO in THREAD {thread}] -- {line}\n");
 
         self.write_to_log(&line);
@@ -35,7 +35,7 @@ impl Logger {
         }
     }
 
-    pub(crate) fn log_error(&self, line: String, thread: u16, print: bool) {
+    pub fn log_error(&self, line: String, thread: u16, print: bool) {
         let line = format!("[ERROR in THREAD {thread} -- {line}\n");
 
         self.write_to_log(&line);
@@ -45,7 +45,7 @@ impl Logger {
         }
     }
 
-    pub(crate) fn append_failed_paths_to_log(&self, paths: &MutexGuard<Vec<String>>) {
+    pub fn append_failed_paths_to_log(&self, paths: &MutexGuard<Vec<String>>) {
         if paths.len() == 0 {
             return;
         }
@@ -59,7 +59,7 @@ impl Logger {
         self.write_to_log(&to_write);
     }
 
-    pub(crate) fn get_log_path(&self) -> Display {
+    pub fn get_log_path(&self) -> Display {
         self.log_path.display()
     }
 
@@ -122,4 +122,4 @@ impl Logger {
     fn print(&self, line: String) {
         self.progress.println(line);
     }
-}
+} 

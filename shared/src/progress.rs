@@ -1,13 +1,13 @@
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use std::time::Duration;
 
-pub(crate) struct Progress {
+pub struct Progress {
     multi_progress: MultiProgress,
     progress: ProgressBar,
 }
 
 impl Progress {
-    pub(crate) fn new(length: usize, eta: bool) -> Self {
+    pub fn new(length: usize, eta: bool) -> Self {
         let multi = MultiProgress::new();
         let progress = multi.add(ProgressBar::new(length as u64));
         let progress_bar_template = if eta {
@@ -28,27 +28,27 @@ impl Progress {
         }
     }
 
-    pub(crate) fn inc(&self, amount: u64) {
+    pub fn inc(&self, amount: u64) {
         self.progress.inc(amount);
     }
 
-    pub(crate) fn start_stick(&self, millis: u32) {
+    pub fn start_stick(&self, millis: u32) {
         self.progress.enable_steady_tick(Duration::new(0, millis));
     }
 
-    pub(crate) fn println(&self, message: String) {
+    pub fn println(&self, message: String) {
         self.multi_progress.println(message).unwrap();
     }
 
-    pub(crate) fn finish(&self) {
+    pub fn finish(&self) {
         self.progress.abandon();
     }
 
-    pub(crate) fn len(&self) -> u64 {
+    pub fn len(&self) -> u64 {
         self.progress.length().unwrap()
     }
 
-    pub(crate) fn value(&self) -> u64 {
+    pub fn value(&self) -> u64 {
         self.progress.position()
     }
-}
+} 
