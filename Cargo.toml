@@ -1,5 +1,12 @@
-[package]
-name = "ffzap"
+[workspace]
+members = [
+    "cli",
+    "shared", 
+    "ui"
+]
+resolver = "2"
+
+[workspace.package]
 version = "1.1.2"
 edition = "2021"
 description = "⚡ A multithreaded CLI for digital media processing using ffmpeg. If ffmpeg can do it, ffzap can do it - as many files in parallel as your system can handle."
@@ -9,7 +16,7 @@ repository = "https://github.com/CodeF0x/ffzap"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
+[workspace.dependencies]
 chrono = "0.4.39"
 clap = { version = "4.5.20", features = ["derive"] }
 dirs = "6.0.0"
