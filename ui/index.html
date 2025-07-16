@@ -1,43 +1,162 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="/src/styles.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tauri App</title>
-    <script type="module" src="/src/main.ts" defer></script>
-  </head>
 
-  <body>
-    <main class="container">
-      <h1>Welcome to Tauri</h1>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="/src/styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FFZap - Media Processing</title>
+  <script type="module" src="/src/main.ts" defer></script>
+</head>
 
-      <div class="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/src/assets/vite.svg" class="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img
-            src="/src/assets/tauri.svg"
-            class="logo tauri"
-            alt="Tauri logo"
-          />
-        </a>
-        <a href="https://www.typescriptlang.org/docs" target="_blank">
-          <img
-            src="/src/assets/typescript.svg"
-            class="logo typescript"
-            alt="typescript logo"
-          />
-        </a>
-      </div>
-      <p>Click on the Tauri logo to learn more about the framework</p>
+<body>
+  <main class="container">
+    <header class="header">
+      <h1>⚡ FFZap</h1>
+      <p class="subtitle">Multithreaded Media Processing with FFmpeg</p>
+    </header>
 
-      <form class="row" id="greet-form">
-        <input id="greet-input" placeholder="Enter a name..." />
-        <button type="submit">Greet</button>
-      </form>
-      <p id="greet-msg"></p>
-    </main>
-  </body>
+    <div class="main-content">
+      <!-- File Input Section -->
+      <section class="section">
+        <h2>Input Files</h2>
+        <div class="input-method">
+          <div class="method-tabs">
+            <button class="tab-btn active" data-tab="files">Select Files</button>
+            <button class="tab-btn" data-tab="list">File List</button>
+          </div>
+
+          <div class="tab-content active" id="files-tab">
+            <div class="browse-files-btn-container">
+              <button class="browse-btn" id="browse-files-btn">Browse Files</button>
+            </div>
+            <div class="selected-files">
+              <h3>Selected Files (<span id="file-amount">0</span>)</h3>
+              <div class="file-list" id="file-list">Non selected</div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="list-tab">
+            <div class="browse-files-btn-container">
+              <button class="browse-btn" id="browse-list-btn">Browse Files</button>
+            </div>
+            <div class="selected-files">
+              <h3>File List Path</h3>
+              <div class="file-list-path" id="file-list-path">None selected</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Processing Options Section -->
+      <section class="section">
+        <h2>Processing Options</h2>
+
+        <div class="options-grid">
+          <!-- Thread Count -->
+          <div class="option-group">
+            <label for="thread-count">Thread Count:</label>
+            <div class="input-with-info">
+              <input type="number" id="thread-count" min="1" max="128" value="2" />
+              <span class="info-text">Most systems can handle 2. Increase for powerful computers.</span>
+            </div>
+          </div>
+
+          <!-- FFmpeg Options -->
+          <div class="option-group full-width">
+            <label for="ffmpeg-options">FFmpeg Options:</label>
+            <textarea id="ffmpeg-options"
+              placeholder="e.g., -c:v libx265 -preset medium -crf 23 -c:a libopus -b:a 128k"></textarea>
+          </div>
+
+          <!-- Output Pattern -->
+          <div class="option-group full-width">
+            <label for="output-pattern">Output Pattern:</label>
+            <div class="input-with-info">
+              <input type="text" id="output-pattern" placeholder="e.g., Output/{{name}}_processed.{{ext}}"
+                value="Output/{{name}}_processed.{{ext}}" />
+              <span class="info-text">Use {{name}}, {{ext}}, {{dir}} placeholders</span>
+            </div>
+            <div class="placeholder-examples">
+              <span class="placeholder-example">{{name}} - filename without extension</span>
+              <span class="placeholder-example">{{ext}} - file extension</span>
+              <span class="placeholder-example">{{dir}} - directory path</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Advanced Options Section -->
+      <section class="section">
+        <h2>Advanced Options</h2>
+        <div class="options-grid">
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="overwrite" />
+              <span class="checkmark"></span>
+              Overwrite existing files
+            </label>
+          </div>
+
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="verbose" />
+              <span class="checkmark"></span>
+              Verbose logging
+            </label>
+          </div>
+
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="delete-source" />
+              <span class="checkmark"></span>
+              Delete source files after processing
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- Progress Section -->
+      <section class="section" id="progress-section" style="display: none;">
+        <h2>Processing Progress</h2>
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <div class="progress-info">
+            <span id="progress-text">0 / 0 files processed</span>
+            <span id="progress-percent">0%</span>
+          </div>
+          <div class="progress-details">
+            <span id="current-file">Ready to start</span>
+            <span id="eta-text" style="display: none;">ETA: --:--</span>
+          </div>
+        </div>
+        <button class="cancel-btn" id="cancel-btn">Cancel Processing</button>
+      </section>
+
+      <!-- Action Buttons -->
+      <section class="section">
+        <div class="action-buttons">
+          <button class="primary-btn" id="start-btn">Start Processing</button>
+        </div>
+      </section>
+
+      <!-- Log Section -->
+      <section class="section">
+        <h2>Processing Log</h2>
+        <div class="log-container">
+          <div class="log-header">
+            <span>Log Output</span>
+            <button class="clear-log-btn" id="clear-log-btn">Clear</button>
+          </div>
+          <div class="log-content" id="log-content">
+            <p class="log-entry info">Ready to process files. Select input files and configure options above.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+
 </html>
