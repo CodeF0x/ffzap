@@ -2,7 +2,7 @@
 members = [
     "cli",
     "shared", 
-    "ui"
+    "ui/src-tauri"
 ]
 resolver = "2"
 
