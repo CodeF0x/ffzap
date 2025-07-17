@@ -10,5 +10,6 @@ repository.workspace = true
 [dependencies]
 chrono.workspace = true
 dirs.workspace = true
-indicatif.workspace = true 
+indicatif.workspace = true
 clap.workspace = true
+serde.workspace = true
