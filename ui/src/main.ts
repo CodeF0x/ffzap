@@ -1,4 +1,6 @@
 import { open } from '@tauri-apps/plugin-dialog';
+import { invoke } from '@tauri-apps/api/core';
+import { CmdArgs } from './models';
 
 document.addEventListener('DOMContentLoaded', () => {
     let allFiles: string[] | null = null;
@@ -47,6 +49,29 @@ document.addEventListener('DOMContentLoaded', () => {
         updateFileCount(0);
         updatePathsList(allFiles);
         updateFileList(filesList);
+    });
+
+    document.getElementById('start-btn')!.addEventListener('click', () => {
+        const threadCountInput = document.getElementById('thread-count') as HTMLInputElement;
+        const ffmpegOptionsInput = document.getElementById('ffmpeg-options') as HTMLTextAreaElement;
+        const outputPatternInput = document.getElementById('output-pattern') as HTMLInputElement;
+        const overwriteCheckbox = document.getElementById('overwrite') as HTMLInputElement;
+        const verboseCheckbox = document.getElementById('verbose') as HTMLInputElement;
+        const deleteCheckbox = document.getElementById('delete-source') as HTMLInputElement;
+
+        const args: CmdArgs = {
+            thread_count: Number(threadCountInput.value),
+            ffmpeg_options: ffmpegOptionsInput.value ? ffmpegOptionsInput.value : null,
+            input: allFiles && allFiles.length > 0 ? allFiles : null,
+            file_list: filesList ? filesList : null,
+            overwrite: overwriteCheckbox.checked,
+            verbose: verboseCheckbox.checked,
+            delete: deleteCheckbox.checked,
+            eta: false,
+            output: outputPatternInput.value
+        };
+
+        invoke('start_job', { options: JSON.stringify(args) });
     });
 });
 
