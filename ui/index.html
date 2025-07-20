@@ -116,32 +116,14 @@
         </div>
       </section>
 
-      <!-- Progress Section -->
-      <section class="section" id="progress-section" style="display: none;">
-        <h2>Processing Progress</h2>
-        <div class="progress-container">
-          <div class="progress-bar">
-            <div class="progress-fill" id="progress-fill"></div>
-          </div>
-          <div class="progress-info">
-            <span id="progress-text">0 / 0 files processed</span>
-            <span id="progress-percent">0%</span>
-          </div>
-          <div class="progress-details">
-            <span id="current-file">Ready to start</span>
-            <span id="eta-text" style="display: none;">ETA: --:--</span>
-          </div>
-        </div>
-        <button class="cancel-btn" id="cancel-btn">Cancel Processing</button>
-      </section>
-
-      <!-- Action Buttons -->
-      <section class="section">
-        <div class="action-buttons">
-          <button class="primary-btn" id="start-btn">Start Processing</button>
+      <!-- Progress Bar Section (added above log) -->
+      <section class="section" id="progress-bar-section" style="display: none;">
+        <h2>Progress</h2>
+        <progress id="progress-bar" value="0" max="0" style="width: 100%; height: 24px;"></progress>
+        <div style="text-align: right; margin-top: 4px;">
+          <span id="progress-text">0 / 0</span>
         </div>
       </section>
-
       <!-- Log Section -->
       <section class="section">
         <h2>Processing Log</h2>
@@ -153,6 +135,13 @@
           <div class="log-content" id="log-content">
             <p class="log-entry info">Ready to process files. Select input files and configure options above.</p>
           </div>
+        </div>
+      </section>
+
+      <!-- Action Buttons -->
+      <section class="section">
+        <div class="action-buttons">
+          <button class="primary-btn" id="start-btn">Start Processing</button>
         </div>
       </section>
     </div>

@@ -51,4 +51,4 @@ impl Progress {
     pub fn value(&self) -> u64 {
         self.progress.position()
     }
-} 
+}

@@ -1090,6 +1090,7 @@ dependencies = [
  "dirs",
  "indicatif",
  "serde",
+ "tauri",
 ]
 
 [[package]]

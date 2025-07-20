@@ -9,4 +9,4 @@ repository.workspace = true
 
 [dependencies]
 ffzap-shared = { path = "../shared" }
-clap.workspace = true 
+clap.workspace = true

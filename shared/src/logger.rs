@@ -122,4 +122,4 @@ impl Logger {
     fn print(&self, line: String) {
         self.progress.println(line);
     }
-} 
+}
