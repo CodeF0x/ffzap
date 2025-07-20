@@ -1,5 +1,5 @@
 use clap::Parser;
-use ffzap_shared::{load_paths, processor, CmdArgs, Logger, Processor, Progress};
+use ffzap_shared::{load_paths, CmdArgs, Logger, Processor, Progress};
 use std::sync::Arc;
 
 fn main() {
@@ -15,6 +15,8 @@ fn main() {
     let logger = Arc::new(Logger::new(Arc::clone(&progress)));
     let processor = Processor::new(Arc::clone(&logger), Arc::clone(&progress));
 
+    // IDE may throw an error here that only 7 out of 8 arguments are supplied, but that's just the IDE not understanding
+    // that ffzap-shared is used without the ui feature and therefore process_files only accepts 7 arguments.
     processor.process_files(
         paths,
         cmd_args.thread_count,

@@ -12,4 +12,9 @@ chrono.workspace = true
 dirs.workspace = true
 indicatif.workspace = true
 clap.workspace = true
-serde.workspace = true
+serde = { workspace = true, features = ["derive"] }
+tauri = { version = "2.6.2", optional = true }
+
+[features]
+default = []
+ui = ["tauri"]
