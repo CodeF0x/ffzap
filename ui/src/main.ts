@@ -59,7 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
         updateFileList(filesList);
     });
 
-    document.getElementById('start-btn')!.addEventListener('click', () => {
+    document.getElementById('start-btn')!.addEventListener('click', event => {
+        const startBtn: HTMLButtonElement = event.target as HTMLButtonElement;
         const threadCountInput: HTMLInputElement = document.getElementById('thread-count')! as HTMLInputElement;
         const ffmpegOptionsInput: HTMLTextAreaElement = document.getElementById('ffmpeg-options')! as HTMLTextAreaElement;
         const outputPatternInput: HTMLInputElement = document.getElementById('output-pattern')! as HTMLInputElement;
@@ -87,7 +88,10 @@ document.addEventListener('DOMContentLoaded', () => {
         clearLogSection();
 
         invoke('start_job', { options: JSON.stringify(args) });
+        startBtn.disabled = true;
     });
+
+    listen<void>('job-finished', _ => (document.getElementById('start-btn') as HTMLButtonElement).disabled = false)
 
     listen<number>('update-total-file-count', event => totalFiles = event.payload);
 
@@ -102,6 +106,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     listen<string>('log-update-error', event => {
         updateLog(event.payload, LogSeverity.ERROR);
+    });
+
+    listen('job-finished', () => {
+        const startBtn: HTMLButtonElement = document.getElementById('start-btn')! as HTMLButtonElement;
+        startBtn.disabled = false;
     });
 });
 
