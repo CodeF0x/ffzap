@@ -1,18 +1,19 @@
 use std::{sync::Arc, thread};
 
 use ffzap_shared::{load_paths, CmdArgs, Logger, Processor, Progress};
-use tauri::AppHandle;
+use tauri::{AppHandle, Emitter};
 
 #[tauri::command]
 fn start_job(app: AppHandle, options: String) {
     let args = serde_json::from_str::<CmdArgs>(&options).unwrap();
-    println!("Encoding has started with options: {:?}", args);
 
+    let app_handle = app.clone();
     let paths = load_paths(&args);
     let progress = Arc::new(Progress::new(paths.len(), args.eta));
-    let logger = Arc::new(Logger::new(Arc::clone(&progress)));
+    let logger = Arc::new(Logger::new(Arc::clone(&progress), app_handle.clone()));
     let processor = Processor::new(Arc::clone(&logger), Arc::clone(&progress));
-    let app_handle = app.clone();
+
+    let _ = app_handle.emit("update-total-file-count", paths.len());
 
     thread::spawn(move || {
         processor.process_files(

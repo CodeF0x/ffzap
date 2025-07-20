@@ -58,7 +58,8 @@
             <label for="thread-count">Thread Count:</label>
             <div class="input-with-info">
               <input type="number" id="thread-count" min="1" max="128" value="2" />
-              <span class="info-text">Most systems can handle 2. Increase for powerful computers.</span>
+              <span class="info-text">Most systems can handle 2. Increase for powerful computers. Adding more threads
+                does not automatically make your job faster!</span>
             </div>
           </div>
 
@@ -125,15 +126,14 @@
         </div>
       </section>
       <!-- Log Section -->
-      <section class="section">
+      <section class="section" id="log-section" style="display: none;">
         <h2>Processing Log</h2>
         <div class="log-container">
           <div class="log-header">
             <span>Log Output</span>
-            <button class="clear-log-btn" id="clear-log-btn">Clear</button>
           </div>
           <div class="log-content" id="log-content">
-            <p class="log-entry info">Ready to process files. Select input files and configure options above.</p>
+            <span class="log-entry info">Ready to process files. Select input files and configure options above.</span>
           </div>
         </div>
       </section>

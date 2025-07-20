@@ -1,3 +1,6 @@
+#[cfg(feature = "ui")]
+use tauri::AppHandle;
+
 use crate::progress::Progress;
 use std::fs;
 use std::fs::File;
@@ -9,20 +12,31 @@ pub struct Logger {
     progress: Arc<Progress>,
     log_file: Arc<Mutex<File>>,
     log_path: PathBuf,
+    #[cfg(feature = "ui")]
+    app_handle: AppHandle,
 }
 
 impl Logger {
-    pub fn new(progress: Arc<Progress>) -> Self {
+    pub fn new(progress: Arc<Progress>, #[cfg(feature = "ui")] app_handle: AppHandle) -> Self {
         let path_file_tuple = Self::setup_log_dir_and_create_log_file();
 
         let log_path = path_file_tuple.0;
         let log_file = path_file_tuple.1;
 
-        Logger {
+        #[cfg(not(feature = "ui"))]
+        return Logger {
             log_path,
             log_file,
             progress,
-        }
+        };
+
+        #[cfg(feature = "ui")]
+        return Logger {
+            log_path,
+            log_file,
+            progress,
+            app_handle,
+        };
     }
 
     pub fn log_info(&self, line: String, thread: u16, print: bool) {
@@ -31,6 +45,13 @@ impl Logger {
         self.write_to_log(&line);
 
         if print {
+            #[cfg(feature = "ui")]
+            {
+                use tauri::Emitter;
+
+                let _ = self.app_handle.emit("log-update-info", &line);
+            }
+
             self.print(line);
         }
     }
@@ -41,6 +62,13 @@ impl Logger {
         self.write_to_log(&line);
 
         if print {
+            #[cfg(feature = "ui")]
+            {
+                use tauri::Emitter;
+
+                let _ = self.app_handle.emit("log-update-error", &line);
+            }
+
             self.print(line);
         }
     }

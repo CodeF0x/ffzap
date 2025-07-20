@@ -13,7 +13,7 @@ dirs.workspace = true
 indicatif.workspace = true
 clap.workspace = true
 serde = { workspace = true, features = ["derive"] }
-tauri = { version = "2.6.2", optional = true }
+tauri = { workspace = true, optional = true }
 
 [features]
 default = []

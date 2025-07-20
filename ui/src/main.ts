@@ -3,6 +3,11 @@ import { invoke } from '@tauri-apps/api/core';
 import { CmdArgs } from './models';
 import { listen } from '@tauri-apps/api/event';
 
+enum LogSeverity {
+    ERROR = 'error',
+    INFO = 'info'
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     let allFiles: string[] | null = null;
     let filesList: string | null = null;
@@ -55,12 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('start-btn')!.addEventListener('click', () => {
-        const threadCountInput = document.getElementById('thread-count') as HTMLInputElement;
-        const ffmpegOptionsInput = document.getElementById('ffmpeg-options') as HTMLTextAreaElement;
-        const outputPatternInput = document.getElementById('output-pattern') as HTMLInputElement;
-        const overwriteCheckbox = document.getElementById('overwrite') as HTMLInputElement;
-        const verboseCheckbox = document.getElementById('verbose') as HTMLInputElement;
-        const deleteCheckbox = document.getElementById('delete-source') as HTMLInputElement;
+        const threadCountInput: HTMLInputElement = document.getElementById('thread-count')! as HTMLInputElement;
+        const ffmpegOptionsInput: HTMLTextAreaElement = document.getElementById('ffmpeg-options')! as HTMLTextAreaElement;
+        const outputPatternInput: HTMLInputElement = document.getElementById('output-pattern')! as HTMLInputElement;
+        const overwriteCheckbox: HTMLInputElement = document.getElementById('overwrite')! as HTMLInputElement;
+        const verboseCheckbox: HTMLInputElement = document.getElementById('verbose')! as HTMLInputElement;
+        const deleteCheckbox: HTMLInputElement = document.getElementById('delete-source')! as HTMLInputElement;
 
         const args: CmdArgs = {
             thread_count: Number(threadCountInput.value),
@@ -74,28 +79,39 @@ document.addEventListener('DOMContentLoaded', () => {
             output: outputPatternInput.value
         };
 
-        if (allFiles && allFiles.length > 0) {
-            totalFiles = allFiles.length;
-        } else if (filesList) {
-            // If using a file list, you may want to fetch the count from the backend if not known
-            // For now, set to 0 (or update this logic as needed)
-            totalFiles = 0;
-        } else {
-            totalFiles = 0;
-        }
         doneFiles = 0;
+
         updateProgressBar(doneFiles, totalFiles);
         showProgressBar();
+        showLogSection(verboseCheckbox.checked);
+        clearLogSection();
+
         invoke('start_job', { options: JSON.stringify(args) });
     });
 
-    // Listen for progress-update events from backend
-    listen<number>('progress-update', (event) => {
-        console.log(event);
+    listen<number>('update-total-file-count', event => totalFiles = event.payload);
+
+    listen<number>('progress-update', event => {
         doneFiles = event.payload;
         updateProgressBar(doneFiles, totalFiles);
     });
+
+    listen<string>('log-update-info', event => {
+        updateLog(event.payload, LogSeverity.INFO);
+    });
+
+    listen<string>('log-update-error', event => {
+        updateLog(event.payload, LogSeverity.ERROR);
+    });
 });
+
+function updateLog(toWrite: string, severity: LogSeverity): void {
+    const logEntry: HTMLSpanElement = document.createElement('span');
+    logEntry.innerText = toWrite;
+    logEntry.classList.add('log-entry', severity === LogSeverity.INFO ? 'info' : 'error');
+
+    document.getElementById('log-content')?.appendChild(logEntry);
+}
 
 function updateFileCount(count: number): void {
     document.getElementById('file-amount')!.innerText = `${count}`;
@@ -130,4 +146,16 @@ function showProgressBar(): void {
     if (progressSection) {
         progressSection.style.display = 'block';
     }
+}
+
+function showLogSection(show: boolean): void {
+    if (!show) {
+        return;
+    }
+
+    document.getElementById('log-section')!.style.display = 'block';
+}
+
+function clearLogSection(): void {
+    document.getElementById('log-content')!.innerHTML = '';
 }

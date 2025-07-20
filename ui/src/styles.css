@@ -523,8 +523,9 @@ label {
 }
 
 .log-content {
-  max-height: 300px;
+  max-height: 500px;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 16px;
   background-color: var(--surface-color);
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
