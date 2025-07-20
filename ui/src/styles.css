@@ -211,6 +211,13 @@ body {
   box-shadow: var(--shadow-hover);
 }
 
+.primary-btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--primary-color);
+  color: white;
+}
+
 .secondary-btn {
   background-color: var(--secondary-color);
   color: white;

@@ -24,8 +24,10 @@ fn start_job(app: AppHandle, options: String) {
             args.overwrite,
             args.verbose,
             args.delete,
-            app_handle,
+            app_handle.clone(),
         );
+
+        let _ = app_handle.emit("job-finished", ());
     });
 }
 
