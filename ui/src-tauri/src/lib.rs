@@ -27,7 +27,14 @@ fn start_job(app: AppHandle, options: String) {
             app_handle.clone(),
         );
 
-        let _ = app_handle.emit("job-finished", ());
+        let _ = app_handle.emit(
+            "job-finished",
+            (
+                logger.get_log_path().to_string(),
+                progress.value(),
+                processor.get_failed_paths(),
+            ),
+        );
     });
 }
 

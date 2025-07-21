@@ -12,6 +12,8 @@ fn main() {
 
     let paths = load_paths(&cmd_args);
     let progress = Arc::new(Progress::new(paths.len(), cmd_args.eta));
+    // IDE may throw an error here that only 1 out of 2 arguments are supplied, but that's just the IDE not understanding
+    // that ffzap-shared is used without the ui feature and therefore process_files only accepts 2 arguments.
     let logger = Arc::new(Logger::new(Arc::clone(&progress)));
     let processor = Processor::new(Arc::clone(&logger), Arc::clone(&progress));
 

@@ -10,3 +10,8 @@ export interface CmdArgs {
     eta: boolean;
     output: string;
 }
+
+export enum LogSeverity {
+    ERROR = 'error',
+    INFO = 'info'
+}
