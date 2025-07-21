@@ -23,36 +23,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
   prepareTabs();
 
-  document
-    .getElementById('browse-files-btn')!
-    .addEventListener('click', async () => {
-      const files: string[] | null = await open({
-        multiple: true,
-        directory: false,
-      });
+  const browseFilesBtn = document.getElementById(
+    'browse-files-btn'
+  ) as HTMLButtonElement;
+  const browseListBtn = document.getElementById(
+    'browse-list-btn'
+  ) as HTMLButtonElement;
 
-      allFiles = files;
-      filesList = null;
-
-      updateFileCount(allFiles?.length ?? 0);
-      updatePathsList(allFiles);
-      updateFileList(filesList);
+  browseFilesBtn.addEventListener('click', async () => {
+    const files: string[] | null = await open({
+      multiple: true,
+      directory: false,
     });
-  document
-    .getElementById('browse-list-btn')!
-    .addEventListener('click', async () => {
-      const file: string | null = await open({
-        multiple: false,
-        directory: false,
-      });
 
-      allFiles = [];
-      filesList = file;
+    allFiles = files;
+    filesList = null;
 
-      updateFileCount(0);
-      updatePathsList(allFiles);
-      updateFileList(filesList);
+    updateFileCount(allFiles?.length ?? 0);
+    updatePathsList(allFiles);
+    updateFileList(filesList);
+  });
+  browseListBtn.addEventListener('click', async () => {
+    const file: string | null = await open({
+      multiple: false,
+      directory: false,
     });
+
+    allFiles = [];
+    filesList = file;
+
+    updateFileCount(0);
+    updatePathsList(allFiles);
+    updateFileList(filesList);
+  });
 
   document.getElementById('start-btn')!.addEventListener('click', event => {
     const startBtn: HTMLButtonElement = event.target as HTMLButtonElement;
@@ -98,11 +101,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     invoke('start_job', { options: JSON.stringify(args) });
     startBtn.disabled = true;
+    browseFilesBtn.disabled = true;
+    browseListBtn.disabled = true;
   });
 
   listen<[string, number, string[]]>('job-finished', event => {
     (document.getElementById('start-btn') as HTMLButtonElement).disabled =
       false;
+    browseFilesBtn.disabled = false;
+    browseListBtn.disabled = false;
 
     addSpacerToLog();
 
@@ -142,12 +149,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   listen<string>('log-update-error', event => {
     updateLog(event.payload, LogSeverity.ERROR);
-  });
-
-  listen('job-finished', () => {
-    const startBtn: HTMLButtonElement = document.getElementById(
-      'start-btn'
-    )! as HTMLButtonElement;
-    startBtn.disabled = false;
   });
 });
