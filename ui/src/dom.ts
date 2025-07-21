@@ -1,85 +1,96 @@
-import { LogSeverity } from "./models";
+import { LogSeverity } from './models';
 
 export function addSpacerToLog(): void {
-    const logContent: HTMLElement = document.getElementById('log-content')!;
-    const spacer: HTMLParagraphElement = document.createElement('p');
-    spacer.innerHTML = '&nbsp;';
+  const logContent: HTMLElement = document.getElementById('log-content')!;
+  const spacer: HTMLParagraphElement = document.createElement('p');
+  spacer.innerHTML = '&nbsp;';
 
-    logContent.appendChild(spacer);
+  logContent.appendChild(spacer);
 }
 
 export function updateLog(toWrite: string, severity: LogSeverity): void {
-    const logEntry: HTMLSpanElement = document.createElement('span');
-    logEntry.innerText = toWrite;
-    logEntry.classList.add('log-entry', severity === LogSeverity.INFO ? 'info' : 'error');
+  const logEntry: HTMLSpanElement = document.createElement('span');
+  logEntry.innerText = toWrite;
+  logEntry.classList.add(
+    'log-entry',
+    severity === LogSeverity.INFO ? 'info' : 'error'
+  );
 
-    document.getElementById('log-content')?.appendChild(logEntry);
+  document.getElementById('log-content')?.appendChild(logEntry);
 }
 
 export function updateFileCount(count: number): void {
-    document.getElementById('file-amount')!.innerText = `${count}`;
+  document.getElementById('file-amount')!.innerText = `${count}`;
 }
 
 export function updatePathsList(files: string[] | null): void {
-    const fileListElement: HTMLElement = document.getElementById('file-list')!;
+  const fileListElement: HTMLElement = document.getElementById('file-list')!;
 
-    if (!files) {
-        return;
-    }
+  if (!files) {
+    return;
+  }
 
-    fileListElement.innerText = files.length ? files.join('\n') : 'None selected';
+  fileListElement.innerText = files.length ? files.join('\n') : 'None selected';
 }
 
 export function updateFileList(path: string | null): void {
-    document.getElementById('file-list-path')!.innerText = path ? path : 'None selected';
+  document.getElementById('file-list-path')!.innerText = path
+    ? path
+    : 'None selected';
 }
 
 export function updateProgressBar(done: number, total: number): void {
-    const progressBar = document.getElementById('progress-bar') as HTMLProgressElement;
-    const progressText = document.getElementById('progress-text');
-    if (progressBar && progressText) {
-        progressBar.max = total;
-        progressBar.value = done;
-        progressText.textContent = `${done} / ${total} files processed`;
-    }
+  const progressBar = document.getElementById(
+    'progress-bar'
+  ) as HTMLProgressElement;
+  const progressText = document.getElementById('progress-text');
+  if (progressBar && progressText) {
+    progressBar.max = total;
+    progressBar.value = done;
+    progressText.textContent = `${done} / ${total} files processed`;
+  }
 }
 
 export function showProgressBar(): void {
-    const progressSection = document.getElementById('progress-bar-section');
-    if (progressSection) {
-        progressSection.style.display = 'block';
-    }
+  const progressSection = document.getElementById('progress-bar-section');
+  if (progressSection) {
+    progressSection.style.display = 'block';
+  }
 }
 
 export function showLogSection(show: boolean): void {
-    if (!show) {
-        return;
-    }
+  if (!show) {
+    return;
+  }
 
-    document.getElementById('log-section')!.style.display = 'block';
+  document.getElementById('log-section')!.style.display = 'block';
 }
 
 export function clearLogSection(): void {
-    document.getElementById('log-content')!.innerHTML = '';
+  document.getElementById('log-content')!.innerHTML = '';
 }
 
 export function prepareTabs(): void {
-    const tabButtons: NodeListOf<Element> = document.querySelectorAll('.tab-btn');
-    const tabContents: NodeListOf<Element> = document.querySelectorAll('.tab-content');
+  const tabButtons: NodeListOf<Element> = document.querySelectorAll('.tab-btn');
+  const tabContents: NodeListOf<Element> =
+    document.querySelectorAll('.tab-content');
 
-    tabButtons.forEach((button: Element) => {
-        button.addEventListener('click', () => {
-            const targetTab: string | null = button.getAttribute('data-tab');
+  tabButtons.forEach((button: Element) => {
+    button.addEventListener('click', () => {
+      const targetTab: string | null = button.getAttribute('data-tab');
 
-            tabButtons.forEach((btn: Element) => btn.classList.remove('active'));
-            tabContents.forEach((content: Element) => content.classList.remove('active'));
+      tabButtons.forEach((btn: Element) => btn.classList.remove('active'));
+      tabContents.forEach((content: Element) =>
+        content.classList.remove('active')
+      );
 
-            button.classList.add('active');
-            const targetContent: HTMLElement | null = document.getElementById(`${targetTab}-tab`);
-            if (targetContent) {
-                targetContent.classList.add('active');
-            }
-        });
+      button.classList.add('active');
+      const targetContent: HTMLElement | null = document.getElementById(
+        `${targetTab}-tab`
+      );
+      if (targetContent) {
+        targetContent.classList.add('active');
+      }
     });
-
+  });
 }
