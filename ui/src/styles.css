@@ -36,7 +36,13 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
   font-size: 16px;
   line-height: 1.6;
   color: var(--text-color);
@@ -63,7 +69,11 @@ body {
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 8px;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -250,6 +260,13 @@ body {
   background-color: var(--text-color);
 }
 
+.browse-btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--surface-color);
+  color: var(--text-secondary);
+}
+
 /* Input Groups */
 .input-group {
   display: flex;
@@ -324,8 +341,6 @@ label {
   font-style: italic;
 }
 
-
-
 /* Placeholder Examples */
 .placeholder-examples {
   display: flex;
@@ -357,7 +372,7 @@ label {
   font-weight: 400;
 }
 
-.checkbox-label input[type="checkbox"] {
+.checkbox-label input[type='checkbox'] {
   display: none;
 }
 
@@ -370,12 +385,12 @@ label {
   transition: var(--transition);
 }
 
-.checkbox-label input[type="checkbox"]:checked+.checkmark {
+.checkbox-label input[type='checkbox']:checked + .checkmark {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
 }
 
-.checkbox-label input[type="checkbox"]:checked+.checkmark::after {
+.checkbox-label input[type='checkbox']:checked + .checkmark::after {
   content: '✓';
   position: absolute;
   top: 50%;
@@ -486,7 +501,11 @@ label {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(
+    90deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
   width: 0%;
   transition: width 0.3s ease;
 }
