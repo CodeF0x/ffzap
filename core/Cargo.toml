@@ -20,6 +20,8 @@ indicatif.workspace = true
 clap.workspace = true
 serde = { workspace = true, features = ["derive"] }
 tauri = { workspace = true, optional = true }
+colored = { workspace = true }
+
 
 [features]
 default = []

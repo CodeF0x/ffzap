@@ -1,13 +1,20 @@
 use clap::Parser;
 use ffzap_core::{load_paths, CmdArgs, Logger, Processor, Progress};
 use std::sync::Arc;
+use colored::*;
 
 fn main() {
     let cmd_args = CmdArgs::parse();
 
     if cmd_args.eta {
-        println!("Warning: ETA is a highly experimental feature and prone to absurd estimations. If your encoding process has long pauses in-between each processed file, you WILL experience incredibly inaccurate estimations!");
-        println!("This is due to unwanted behaviour in one of ffzap's dependencies and cannot be fixed by ffzap.");
+        let line_1 = "Warning: ETA is a highly experimental feature and prone to absurd estimations. If your encoding process has long pauses in-between each processed file, you WILL experience incredibly inaccurate estimations!"
+            .bright_yellow()
+            .to_string();
+        let line_2 = "This is due to unwanted behaviour in one of ffzap's dependencies and cannot be fixed by ffzap."
+            .bright_yellow()
+            .to_string();
+        println!("{line_1}");
+        println!("{line_2}");
     }
 
     let paths = load_paths(&cmd_args);
@@ -29,20 +36,31 @@ fn main() {
         cmd_args.delete,
     );
 
-    let final_output = format!(
+    let processed = progress.value();
+    let total = progress.len();
+    let mut final_output = format!(
         "{} out of {} files have been successful. A detailed log has been written to {}",
-        progress.value(),
-        progress.len(),
+        processed,
+        total,
         logger.get_log_path()
     );
+    if processed == total {
+        final_output = final_output.bright_green().to_string();
+    } else {
+        final_output = final_output.bright_yellow().to_string();
+    }
     println!("{final_output}");
 
     let failed_paths = processor.get_failed_paths();
     logger.append_failed_paths_to_log(&std::sync::Mutex::new(failed_paths.clone()).lock().unwrap());
 
     if cmd_args.verbose && !failed_paths.is_empty() {
-        println!("\nThe following files were not processed due to the errors above:");
+        let headline = "The following files were not processed due to the errors above:"
+            .bright_red()
+            .to_string();
+        println!("\n{}", headline);
         for path in failed_paths.iter() {
+            let path = path.bright_red().to_string();
             println!("{path}");
         }
     }

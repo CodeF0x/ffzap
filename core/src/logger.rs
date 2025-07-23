@@ -7,6 +7,7 @@ use std::fs::File;
 use std::io::Write;
 use std::path::{Display, PathBuf};
 use std::sync::{Arc, Mutex, MutexGuard};
+use colored::*;
 
 pub struct Logger {
     progress: Arc<Progress>,
@@ -40,7 +41,8 @@ impl Logger {
     }
 
     pub fn log_info(&self, line: String, thread: u16, print: bool) {
-        let line = format!("[INFO in THREAD {thread}] -- {line}\n");
+        let line = format!("[INFO in THREAD {thread}] -- {line}");
+        let cyan_line = line.cyan().to_string();
 
         self.write_to_log(&line);
 
@@ -52,13 +54,13 @@ impl Logger {
                 let _ = self.app_handle.emit("log-update-info", &line);
             }
 
-            self.print(line);
+            self.print(cyan_line);
         }
     }
 
     pub fn log_error(&self, line: String, thread: u16, print: bool) {
-        let line = format!("[ERROR in THREAD {thread}] -- {line}\n");
-
+        let line = format!("[ERROR in THREAD {thread}] -- {line}");
+        let red_line = line.bright_red().to_string();
         self.write_to_log(&line);
 
         if print {
@@ -69,7 +71,7 @@ impl Logger {
                 let _ = self.app_handle.emit("log-update-error", &line);
             }
 
-            self.print(line);
+            self.print(red_line);
         }
     }
 
@@ -143,11 +145,11 @@ impl Logger {
         self.log_file
             .lock()
             .unwrap()
-            .write_all(line.as_bytes())
+            .write_all(format!("{line}\n").as_bytes())
             .unwrap();
     }
 
     fn print(&self, line: String) {
-        self.progress.println(line);
+        self.progress.println(format!("{line}\n"));
     }
 }

@@ -16,3 +16,4 @@ repository.workspace = true
 [dependencies]
 ffzap_core = { path = "../core" }
 clap.workspace = true
+colored.workspace = true

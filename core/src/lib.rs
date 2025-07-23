@@ -5,7 +5,6 @@ pub mod progress;
 
 use std::process::exit;
 use std::{fs, io::ErrorKind};
-use std::fmt::format;
 #[cfg(feature = "ui")]
 use tauri::{AppHandle, Emitter};
 pub use args::CmdArgs;
