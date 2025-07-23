@@ -604,6 +604,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d3fd119d74b830634cea2a0f58bbd0d54540518a14397557951e79340abc28c0"
 
 [[package]]
+name = "colored"
+version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fde0e0ec90c9dfb3b4b1a0891a7dcd0e2bffde2f7efed5fe7c9bb00e5bfb915e"
+dependencies = [
+ "windows-sys 0.59.0",
+]
+
+[[package]]
 name = "combine"
 version = "4.6.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1078,6 +1087,7 @@ name = "ffzap"
 version = "1.1.2"
 dependencies = [
  "clap",
+ "colored",
  "ffzap_core",
 ]
 
@@ -1087,6 +1097,7 @@ version = "1.1.2"
 dependencies = [
  "chrono",
  "clap",
+ "colored",
  "dirs",
  "indicatif",
  "serde",
