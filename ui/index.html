@@ -1,151 +1,192 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FFZap - Media Processing</title>
+    <script type="module" src="/src/main.ts" defer></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <link rel="stylesheet" href="/src/styles.css" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FFZap - Media Processing</title>
-  <script type="module" src="/src/main.ts" defer></script>
-</head>
+  <body>
+    <main class="container">
+      <header class="header">
+        <h1>⚡ FFZap</h1>
+        <p class="subtitle">Multithreaded Media Processing with FFmpeg</p>
+      </header>
 
-<body>
-  <main class="container">
-    <header class="header">
-      <h1>⚡ FFZap</h1>
-      <p class="subtitle">Multithreaded Media Processing with FFmpeg</p>
-    </header>
-
-    <div class="main-content">
-      <!-- File Input Section -->
-      <section class="section">
-        <h2>Input Files</h2>
-        <div class="input-method">
-          <div class="method-tabs">
-            <button class="tab-btn active" data-tab="files">Select Files</button>
-            <button class="tab-btn" data-tab="list">File List</button>
-          </div>
-
-          <div class="tab-content active" id="files-tab">
-            <div class="browse-files-btn-container">
-              <button class="browse-btn" id="browse-files-btn">Browse Files</button>
+      <div class="main-content">
+        <!-- File Input Section -->
+        <section class="section">
+          <h2>Input Files</h2>
+          <div class="input-method">
+            <div class="method-tabs">
+              <button class="tab-btn active" data-tab="files">
+                Select Files
+              </button>
+              <button class="tab-btn" data-tab="list">File List</button>
             </div>
-            <div class="selected-files">
-              <h3>Selected Files (<span id="file-amount">0</span>)</h3>
-              <div class="file-list" id="file-list">Non selected</div>
-            </div>
-          </div>
 
-          <div class="tab-content" id="list-tab">
-            <div class="browse-files-btn-container">
-              <button class="browse-btn" id="browse-list-btn">Browse Files</button>
+            <div class="tab-content active" id="files-tab">
+              <div class="browse-files-btn-container">
+                <button class="browse-btn" id="browse-files-btn">
+                  Browse Files
+                </button>
+              </div>
+              <div class="selected-files">
+                <h3>Selected Files (<span id="file-amount">0</span>)</h3>
+                <div class="file-list" id="file-list">Non selected</div>
+              </div>
             </div>
-            <div class="selected-files">
-              <h3>File List Path</h3>
-              <div class="file-list-path" id="file-list-path">None selected</div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <!-- Processing Options Section -->
-      <section class="section">
-        <h2>Processing Options</h2>
-
-        <div class="options-grid">
-          <!-- Thread Count -->
-          <div class="option-group">
-            <label for="thread-count">Thread Count:</label>
-            <div class="input-with-info">
-              <input type="number" id="thread-count" min="1" max="128" value="2" />
-              <span class="info-text">Most systems can handle 2. Increase for powerful computers. Adding more threads
-                does not automatically make your job faster!</span>
+            <div class="tab-content" id="list-tab">
+              <div class="browse-files-btn-container">
+                <button class="browse-btn" id="browse-list-btn">
+                  Browse Files
+                </button>
+              </div>
+              <div class="selected-files">
+                <h3>File List Path</h3>
+                <div class="file-list-path" id="file-list-path">
+                  None selected
+                </div>
+              </div>
             </div>
           </div>
+        </section>
 
-          <!-- FFmpeg Options -->
-          <div class="option-group full-width">
-            <label for="ffmpeg-options">FFmpeg Options:</label>
-            <textarea id="ffmpeg-options"
-              placeholder="e.g., -c:v libx265 -preset medium -crf 23 -c:a libopus -b:a 128k"></textarea>
-          </div>
+        <!-- Processing Options Section -->
+        <section class="section">
+          <h2>Processing Options</h2>
 
-          <!-- Output Pattern -->
-          <div class="option-group full-width">
-            <label for="output-pattern">Output Pattern:</label>
-            <div class="input-with-info">
-              <input type="text" id="output-pattern" placeholder="e.g., Output/{{name}}_processed.{{ext}}"
-                value="Output/{{name}}_processed.{{ext}}" />
-              <span class="info-text">Use {{name}}, {{ext}}, {{dir}} placeholders</span>
+          <div class="options-grid">
+            <!-- Thread Count -->
+            <div class="option-group">
+              <label for="thread-count">Thread Count:</label>
+              <div class="input-with-info">
+                <input
+                  type="number"
+                  id="thread-count"
+                  min="1"
+                  max="128"
+                  value="2"
+                />
+                <span class="info-text"
+                  >Most systems can handle 2. Increase for powerful computers.
+                  Adding more threads does not automatically make your job
+                  faster!</span
+                >
+              </div>
             </div>
-            <div class="placeholder-examples">
-              <span class="placeholder-example">{{name}} - filename without extension</span>
-              <span class="placeholder-example">{{ext}} - file extension</span>
-              <span class="placeholder-example">{{dir}} - directory path</span>
+
+            <!-- FFmpeg Options -->
+            <div class="option-group full-width">
+              <label for="ffmpeg-options">FFmpeg Options:</label>
+              <textarea
+                id="ffmpeg-options"
+                placeholder="e.g., -c:v libx265 -preset medium -crf 23 -c:a libopus -b:a 128k"
+              ></textarea>
+            </div>
+
+            <!-- Output Pattern -->
+            <div class="option-group full-width">
+              <label for="output-pattern">Output Pattern:</label>
+              <div class="input-with-info">
+                <input
+                  type="text"
+                  id="output-pattern"
+                  placeholder="e.g., Output/{{name}}_processed.{{ext}}"
+                  value="Output/{{name}}_processed.{{ext}}"
+                />
+                <span class="info-text"
+                  >Use {{name}}, {{ext}}, {{dir}} placeholders</span
+                >
+              </div>
+              <div class="placeholder-examples">
+                <span class="placeholder-example"
+                  >{{name}} - filename without extension</span
+                >
+                <span class="placeholder-example"
+                  >{{ext}} - file extension</span
+                >
+                <span class="placeholder-example"
+                  >{{dir}} - directory path</span
+                >
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- Advanced Options Section -->
-      <section class="section">
-        <h2>Advanced Options</h2>
-        <div class="options-grid">
-          <div class="checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" id="overwrite" />
-              <span class="checkmark"></span>
-              Overwrite existing files
-            </label>
+        <!-- Advanced Options Section -->
+        <section class="section">
+          <h2>Advanced Options</h2>
+          <div class="options-grid">
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="overwrite" />
+                <span class="checkmark"></span>
+                Overwrite existing files
+              </label>
+            </div>
+
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="verbose" />
+                <span class="checkmark"></span>
+                Verbose logging
+              </label>
+            </div>
+
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="delete-source" />
+                <span class="checkmark"></span>
+                Delete source files after processing
+              </label>
+            </div>
           </div>
+        </section>
 
-          <div class="checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" id="verbose" />
-              <span class="checkmark"></span>
-              Verbose logging
-            </label>
+        <!-- Progress Bar Section (added above log) -->
+        <section
+          class="section"
+          id="progress-bar-section"
+          style="display: none"
+        >
+          <h2>Progress</h2>
+          <progress
+            id="progress-bar"
+            value="0"
+            max="0"
+            style="width: 100%; height: 24px"
+          ></progress>
+          <div style="text-align: right; margin-top: 4px">
+            <span id="progress-text">0 / 0</span>
           </div>
-
-          <div class="checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" id="delete-source" />
-              <span class="checkmark"></span>
-              Delete source files after processing
-            </label>
+        </section>
+        <!-- Log Section -->
+        <section class="section" id="log-section" style="display: none">
+          <h2>Processing Log</h2>
+          <div class="log-container">
+            <div class="log-header">
+              <span>Log Output</span>
+            </div>
+            <div class="log-content" id="log-content">
+              <span class="log-entry info"
+                >Ready to process files. Select input files and configure
+                options above.</span
+              >
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- Progress Bar Section (added above log) -->
-      <section class="section" id="progress-bar-section" style="display: none;">
-        <h2>Progress</h2>
-        <progress id="progress-bar" value="0" max="0" style="width: 100%; height: 24px;"></progress>
-        <div style="text-align: right; margin-top: 4px;">
-          <span id="progress-text">0 / 0</span>
-        </div>
-      </section>
-      <!-- Log Section -->
-      <section class="section" id="log-section" style="display: none;">
-        <h2>Processing Log</h2>
-        <div class="log-container">
-          <div class="log-header">
-            <span>Log Output</span>
+        <!-- Action Buttons -->
+        <section class="section">
+          <div class="action-buttons">
+            <button class="primary-btn" id="start-btn">Start Processing</button>
           </div>
-          <div class="log-content" id="log-content">
-            <span class="log-entry info">Ready to process files. Select input files and configure options above.</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- Action Buttons -->
-      <section class="section">
-        <div class="action-buttons">
-          <button class="primary-btn" id="start-btn">Start Processing</button>
-        </div>
-      </section>
-    </div>
-  </main>
-</body>
-
+        </section>
+      </div>
+    </main>
+  </body>
 </html>
