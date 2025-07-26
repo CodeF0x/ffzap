@@ -1,7 +1,7 @@
 use std::{sync::Arc, thread};
 
 use ffzap_shared::{load_paths, CmdArgs, Logger, Processor, Progress};
-use tauri::{AppHandle, Emitter};
+use tauri::{AppHandle, Emitter, WindowEvent};
 
 #[tauri::command]
 fn start_job(app: AppHandle, options: String) {
@@ -44,6 +44,27 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![start_job])
+        .on_window_event(|_window, event| {
+            // Windows does not automatically tear down spawned child processes when closing the Tauri main window
+            // This is relevant if the window is closed while there's still ffmpeg processes running
+            #[cfg(target_os = "windows")]
+            if let WindowEvent::CloseRequested { .. } = event {
+                use sysinfo::{System, Process};
+
+                let sys = System::new_all();
+
+                let my_pid = std::process::id();
+
+                let to_kill: Vec<&Process> = sys.processes()
+                    .values()
+                    .filter(|p| p.parent().map(|pp| pp.as_u32()) == Some(my_pid))
+                    .collect();
+
+                for process in to_kill {
+                    process.kill();
+                }
+            }
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
