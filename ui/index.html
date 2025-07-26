@@ -68,7 +68,7 @@
                   type="number"
                   id="thread-count"
                   min="1"
-                  max="128"
+                  max="65535"
                   value="2"
                 />
                 <span class="info-text"
@@ -90,16 +90,16 @@
 
             <!-- Output Pattern -->
             <div class="option-group full-width">
-              <label for="output-pattern">Output Pattern:</label>
+              <label for="output-pattern">Output Path:</label>
               <div class="input-with-info">
                 <input
                   type="text"
                   id="output-pattern"
                   placeholder="e.g., Output/{{name}}_processed.{{ext}}"
-                  value="Output/{{name}}_processed.{{ext}}"
                 />
                 <span class="info-text"
-                  >Use {{name}}, {{ext}}, {{dir}} placeholders</span
+                  >Use {{name}}, {{ext}}, {{dir}}, {{parent}} placeholders.
+                  Absolute paths are recommended</span
                 >
               </div>
               <div class="placeholder-examples">
@@ -110,8 +110,11 @@
                   >{{ext}} - file extension</span
                 >
                 <span class="placeholder-example"
-                  >{{dir}} - directory path</span
+                  >{{dir}} - entire path up to file</span
                 >
+                <span class="placeholder-example">
+                  {{parent}} - parent folder of file
+                </span>
               </div>
             </div>
           </div>
@@ -127,6 +130,9 @@
                 <span class="checkmark"></span>
                 Overwrite existing files
               </label>
+              <span class="info-text warning"
+                >Overwritten files can't be restored!</span
+              >
             </div>
 
             <div class="checkbox-group">
@@ -143,6 +149,9 @@
                 <span class="checkmark"></span>
                 Delete source files after processing
               </label>
+              <span class="info-text warning"
+                >Deleted files can't be restored!</span
+              >
             </div>
           </div>
         </section>
@@ -184,6 +193,9 @@
         <section class="section">
           <div class="action-buttons">
             <button class="primary-btn" id="start-btn">Start Processing</button>
+            <button class="stop-btn" id="stop-btn" style="display: none">
+              Stop Job
+            </button>
           </div>
         </section>
       </div>

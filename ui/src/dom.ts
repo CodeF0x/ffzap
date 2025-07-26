@@ -9,7 +9,7 @@ export function addSpacerToLog(): void {
 }
 
 export function updateLog(toWrite: string, severity: LogSeverity): void {
-  const logEntry: HTMLSpanElement = document.createElement('span');
+  const logEntry: HTMLDivElement = document.createElement('div');
   logEntry.innerText = toWrite;
   logEntry.classList.add(
     'log-entry',
@@ -58,11 +58,7 @@ export function showProgressBar(): void {
   }
 }
 
-export function showLogSection(show: boolean): void {
-  if (!show) {
-    return;
-  }
-
+export function showLogSection(): void {
   document.getElementById('log-section')!.style.display = 'block';
 }
 
@@ -93,4 +89,39 @@ export function prepareTabs(): void {
       }
     });
   });
+}
+
+export function validateButton(
+  allFiles: string[] | null,
+  fileList: string | null
+): void {
+  const button: HTMLButtonElement = document.getElementById(
+    'start-btn'
+  ) as HTMLButtonElement;
+  const outputPattern: HTMLInputElement = document.getElementById(
+    'output-pattern'
+  ) as HTMLInputElement;
+
+  const pattern: string = outputPattern.value.trim();
+  const totalFiles: number = allFiles?.length ?? 0;
+
+  if (pattern !== '' && (totalFiles > 0 || !!fileList)) {
+    button.disabled = false;
+  } else {
+    button.disabled = true;
+  }
+}
+
+export function showStopButton(): void {
+  const stopBtn: HTMLButtonElement = document.getElementById(
+    'stop-btn'
+  ) as HTMLButtonElement;
+  stopBtn.style.display = 'inline-block';
+}
+
+export function hideStopButton(): void {
+  const stopBtn: HTMLButtonElement = document.getElementById(
+    'stop-btn'
+  ) as HTMLButtonElement;
+  stopBtn.style.display = 'none';
 }

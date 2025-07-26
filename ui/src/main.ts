@@ -13,6 +13,9 @@ import {
   addSpacerToLog,
   updateLog,
   prepareTabs,
+  validateButton,
+  showStopButton,
+  hideStopButton,
 } from './dom';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -22,6 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let doneFiles: number = 0;
 
   prepareTabs();
+
+  (document.getElementById('start-btn') as HTMLButtonElement).disabled = true;
 
   const browseFilesBtn = document.getElementById(
     'browse-files-btn'
@@ -42,11 +47,18 @@ document.addEventListener('DOMContentLoaded', () => {
     updateFileCount(allFiles?.length ?? 0);
     updatePathsList(allFiles);
     updateFileList(filesList);
+    validateButton(allFiles, filesList);
   });
   browseListBtn.addEventListener('click', async () => {
     const file: string | null = await open({
       multiple: false,
       directory: false,
+      filters: [
+        {
+          name: 'File Lists',
+          extensions: ['txt', 'lst', 'list'],
+        },
+      ],
     });
 
     allFiles = [];
@@ -55,6 +67,11 @@ document.addEventListener('DOMContentLoaded', () => {
     updateFileCount(0);
     updatePathsList(allFiles);
     updateFileList(filesList);
+    validateButton(allFiles, filesList);
+  });
+
+  document.getElementById('output-pattern')!.addEventListener('keyup', () => {
+    validateButton(allFiles, filesList);
   });
 
   document.getElementById('start-btn')!.addEventListener('click', event => {
@@ -95,21 +112,51 @@ document.addEventListener('DOMContentLoaded', () => {
     doneFiles = 0;
 
     updateProgressBar(doneFiles, totalFiles);
+
     showProgressBar();
-    showLogSection(verboseCheckbox.checked);
+
+    showLogSection();
     clearLogSection();
 
     invoke('start_job', { options: JSON.stringify(args) });
+    updateLog('Job has started, please wait...', LogSeverity.INFO);
+    showStopButton();
+
     startBtn.disabled = true;
     browseFilesBtn.disabled = true;
     browseListBtn.disabled = true;
+    overwriteCheckbox.disabled = true;
+    verboseCheckbox.disabled = true;
+    deleteCheckbox.disabled = true;
+  });
+
+  document.getElementById('stop-btn')!.addEventListener('click', () => {
+    invoke('stop_job');
+    updateLog('Stopping job(s)...', LogSeverity.ERROR);
   });
 
   listen<[string, number, string[]]>('job-finished', event => {
-    (document.getElementById('start-btn') as HTMLButtonElement).disabled =
-      false;
+    const startBtn: HTMLButtonElement = document.getElementById(
+      'start-btn'
+    ) as HTMLButtonElement;
+    const overWriteCheckBox: HTMLInputElement = document.getElementById(
+      'overwrite'
+    ) as HTMLInputElement;
+    const verboseCheckBox: HTMLInputElement = document.getElementById(
+      'verbose'
+    ) as HTMLInputElement;
+    const deleteSourceCheckBox: HTMLInputElement = document.getElementById(
+      'delete-source'
+    ) as HTMLInputElement;
+
+    startBtn.disabled = false;
     browseFilesBtn.disabled = false;
     browseListBtn.disabled = false;
+    overWriteCheckBox.disabled = false;
+    verboseCheckBox.disabled = false;
+    deleteSourceCheckBox.disabled = false;
+
+    hideStopButton();
 
     addSpacerToLog();
 
@@ -121,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
     );
 
     const failedPaths: string[] = event.payload[2];
-    if (failedPaths.length > 0) {
+    if (failedPaths.length > 0 && verboseCheckBox.checked) {
       addSpacerToLog();
 
       const staticLine: string =
@@ -131,6 +178,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       updateLog(finalLine, LogSeverity.ERROR);
     }
+  });
+
+  listen<string>('general-ffmpeg-error', event => {
+    updateLog(event.payload, LogSeverity.ERROR);
   });
 
   listen<number>(
@@ -144,6 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   listen<string>('log-update-info', event => {
+    console.log(event.payload);
     updateLog(event.payload, LogSeverity.INFO);
   });
 

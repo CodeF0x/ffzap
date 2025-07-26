@@ -2,6 +2,7 @@ use crate::{Logger, Progress};
 use std::ffi::OsStr;
 use std::fs::{create_dir_all, remove_file};
 use std::io::ErrorKind;
+use std::os::windows::process::CommandExt;
 use std::path::Path;
 use std::process::{Command, Stdio};
 use std::sync::{Arc, Mutex};
@@ -116,6 +117,8 @@ impl Processor {
                         command.arg(&final_file_name);
                         command.stdout(Stdio::null());
                         command.stderr(Stdio::piped());
+                        #[cfg(target_os = "windows")]
+                        command.creation_flags(0x08000000); // don't show cmd windows on Windows
 
                         if overwrite {
                             command.arg("-y");
@@ -189,7 +192,16 @@ impl Processor {
                                     .push(path.display().to_string());
                             }
                         } else {
-                            eprintln!("[THREAD {thread}] -- There was an error running ffmpeg. Please check if it's correctly installed and working as intended.");
+                            let line = format!("[THREAD {thread}] -- There was an error running ffmpeg. Please check if it's correctly installed and working as intended.");
+
+                            #[cfg(feature = "ui")]
+                            {
+                                use tauri::Emitter;
+
+                                let _ = app_handle.emit("general-ffmpeg-error", &line);
+                            }
+
+                            eprintln!("{}", line);
                         }
                     }
                     None => {
