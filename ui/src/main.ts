@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('stop-btn')!.addEventListener('click', () => {
-    invoke('stop_job');
+    invoke('stop_jobs');
     updateLog('Stopping job(s)...', LogSeverity.ERROR);
   });
 
