@@ -1,6 +1,6 @@
 use std::{sync::Arc, thread};
 
-use ffzap_shared::{load_paths, CmdArgs, Logger, Processor, Progress};
+use ffzap_core::{load_paths, CmdArgs, Logger, Processor, Progress};
 use tauri::{AppHandle, Emitter, WindowEvent};
 
 #[tauri::command]
