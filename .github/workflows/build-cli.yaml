@@ -1,8 +1,7 @@
-name: Build on Release
+name: Build CLI
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -43,7 +42,7 @@ jobs:
           target: ${{ matrix.target }}
 
       - name: Build project
-        run: cargo build --bin ffzap --release --target ${{ matrix.target }}
+        run: cargo build --p ffzap --release --target ${{ matrix.target }}
 
       - name: Prepare archive
         run: |
@@ -83,6 +82,13 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
 
+      - name: Get latest release
+        id: get_latest_release
+        run: |
+          LATEST_RELEASE=$(gh api repos/${{ github.repository }}/releases/latest --jq '.tag_name')
+          echo "latest_release=$LATEST_RELEASE" >> $GITHUB_OUTPUT
+          echo "Latest release: $LATEST_RELEASE"
+
       - name: Update latest release
         uses: softprops/action-gh-release@v2
         with:
@@ -91,7 +97,7 @@ jobs:
             **/*.exe
             **/*.tar.gz
             **/*.sha256
-          tag_name: ${{ github.event.release.tag_name }}
+          tag_name: ${{ steps.get_latest_release.outputs.latest_release }}
           draft: false
           prerelease: false
           append_body: true

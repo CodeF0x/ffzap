@@ -3,17 +3,8 @@ members = ["cli", "core", "ui/src-tauri"]
 resolver = "2"
 
 [workspace.package]
-version = "1.1.2"
 edition = "2021"
-description = "⚡ A multithreaded CLI for digital media processing using ffmpeg. If ffmpeg can do it, ffzap can do it - as many files in parallel as your system can handle."
 license-file = "license.md"
-keywords = [
-    "ffmpeg",
-    "media-processing",
-    "cli",
-    "audio-conversion",
-    "video-conversion",
-]
 repository = "https://github.com/CodeF0x/ffzap"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
