@@ -1,11 +1,17 @@
 [package]
 name = "ffzap_core"
-version.workspace = true
+version = "1.1.2"
 edition.workspace = true
-description.workspace = true
 license-file.workspace = true
-keywords.workspace = true
 repository.workspace = true
+keywords = [
+    "ffmpeg",
+    "media-processing",
+    "cli",
+    "audio-conversion",
+    "video-conversion",
+]
+description = "The core library crate for the ffzap cli and ui."
 
 [dependencies]
 chrono.workspace = true

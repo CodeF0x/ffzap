@@ -1,10 +1,6 @@
 # ffzap ⚡
 
-A multithreaded media processing toolkit built with Rust. ffzap provides both command-line and graphical interfaces for batch processing media files using FFmpeg. If FFmpeg can do it, ffzap can do it - as many files in parallel as your system can handle.
-
-## What is ffzap?
-
-ffzap is a high-performance media processing solution that leverages FFmpeg's capabilities with modern Rust performance. It's designed for users who need to process large batches of media files efficiently, whether they prefer command-line tools or graphical interfaces.
+A multithreaded media processing toolkit built with Rust. ffzap provides both command-line and graphical interfaces for batch processing media files using FFmpeg. If FFmpeg can do it, ffzap can do it - as many files in parallel as your system can handle. It's designed for users who need to process large batches of media files efficiently, whether they prefer command-line tools or graphical interfaces.
 
 **Key Features:**
 
@@ -14,6 +10,10 @@ ffzap is a high-performance media processing solution that leverages FFmpeg's ca
 - 🎨 **Dual Interface**: Both CLI and GUI options
 - 🔧 **Flexible Output**: Customizable file naming with placeholders
 - 📊 **Real-time Progress**: Live progress tracking and detailed logging
+
+## How to install
+
+For the GUI, head to the [latest release](https://github.com/CodeF0x/ffzap/releases/latest), and for the CLI read [its docs](/cli/README.md).
 
 ## Project Components
 
