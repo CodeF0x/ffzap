@@ -8,5 +8,5 @@ keywords.workspace = true
 repository.workspace = true
 
 [dependencies]
-ffzap-shared = { path = "../shared" }
+ffzap_core = { path = "../core" }
 clap.workspace = true

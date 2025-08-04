@@ -1,5 +1,5 @@
 [package]
-name = "ffzap-shared"
+name = "ffzap_core"
 version.workspace = true
 edition.workspace = true
 description.workspace = true

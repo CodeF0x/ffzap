@@ -1078,11 +1078,11 @@ name = "ffzap"
 version = "1.1.2"
 dependencies = [
  "clap",
- "ffzap-shared",
+ "ffzap_core",
 ]
 
 [[package]]
-name = "ffzap-shared"
+name = "ffzap_core"
 version = "1.1.2"
 dependencies = [
  "chrono",
@@ -1094,10 +1094,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "ffzap-ui"
+name = "ffzap_ui"
 version = "1.1.2"
 dependencies = [
- "ffzap-shared",
+ "ffzap_core",
  "serde",
  "serde_json",
  "sysinfo",
