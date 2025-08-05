@@ -2,6 +2,7 @@ use crate::{Logger, Progress};
 use std::ffi::OsStr;
 use std::fs::{create_dir_all, remove_file};
 use std::io::ErrorKind;
+#[cfg(target_os = "windows")]
 use std::os::windows::process::CommandExt;
 use std::path::Path;
 use std::process::{Command, Stdio};
