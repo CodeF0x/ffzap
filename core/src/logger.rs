@@ -7,6 +7,7 @@ use std::fs::File;
 use std::io::Write;
 use std::path::{Display, PathBuf};
 use std::sync::{Arc, Mutex, MutexGuard};
+use colored::*;
 
 pub struct Logger {
     progress: Arc<Progress>,
@@ -41,6 +42,7 @@ impl Logger {
 
     pub fn log_info(&self, line: String, thread: u16, print: bool) {
         let line = format!("[INFO in THREAD {thread}] -- {line}\n");
+        let blue_line = line.bright_blue().to_string();
 
         self.write_to_log(&line);
 
@@ -52,14 +54,14 @@ impl Logger {
                 let _ = self.app_handle.emit("log-update-info", &line);
             }
 
-            self.print(line);
+            self.print(blue_line);
         }
     }
 
     pub fn log_error(&self, line: String, thread: u16, print: bool) {
         let line = format!("[ERROR in THREAD {thread} -- {line}\n");
-
-        self.write_to_log(&line);
+        let red_line = line.bright_red().to_string();
+        self.write_to_log(&red_line);
 
         if print {
             #[cfg(feature = "ui")]
@@ -69,7 +71,7 @@ impl Logger {
                 let _ = self.app_handle.emit("log-update-error", &line);
             }
 
-            self.print(line);
+            self.print(red_line);
         }
     }
 
