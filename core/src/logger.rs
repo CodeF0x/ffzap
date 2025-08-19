@@ -57,7 +57,7 @@ impl Logger {
     }
 
     pub fn log_error(&self, line: String, thread: u16, print: bool) {
-        let line = format!("[ERROR in THREAD {thread} -- {line}\n");
+        let line = format!("[ERROR in THREAD {thread}] -- {line}\n");
 
         self.write_to_log(&line);
 
