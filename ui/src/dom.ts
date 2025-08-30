@@ -13,7 +13,7 @@ export function updateLog(toWrite: string, severity: LogSeverity): void {
   logEntry.innerText = toWrite;
   logEntry.classList.add(
     'log-entry',
-    severity === LogSeverity.INFO ? 'info' : 'error'
+    severity === LogSeverity.INFO ? 'info' : 'error',
   );
 
   document.getElementById('log-content')?.appendChild(logEntry);
@@ -41,7 +41,7 @@ export function updateFileList(path: string | null): void {
 
 export function updateProgressBar(done: number, total: number): void {
   const progressBar = document.getElementById(
-    'progress-bar'
+    'progress-bar',
   ) as HTMLProgressElement;
   const progressText = document.getElementById('progress-text');
   if (progressBar && progressText) {
@@ -77,12 +77,12 @@ export function prepareTabs(): void {
 
       tabButtons.forEach((btn: Element) => btn.classList.remove('active'));
       tabContents.forEach((content: Element) =>
-        content.classList.remove('active')
+        content.classList.remove('active'),
       );
 
       button.classList.add('active');
       const targetContent: HTMLElement | null = document.getElementById(
-        `${targetTab}-tab`
+        `${targetTab}-tab`,
       );
       if (targetContent) {
         targetContent.classList.add('active');
@@ -93,13 +93,13 @@ export function prepareTabs(): void {
 
 export function validateButton(
   allFiles: string[] | null,
-  fileList: string | null
+  fileList: string | null,
 ): void {
   const button: HTMLButtonElement = document.getElementById(
-    'start-btn'
+    'start-btn',
   ) as HTMLButtonElement;
   const outputPattern: HTMLInputElement = document.getElementById(
-    'output-pattern'
+    'output-pattern',
   ) as HTMLInputElement;
 
   const pattern: string = outputPattern.value.trim();
@@ -114,14 +114,14 @@ export function validateButton(
 
 export function showStopButton(): void {
   const stopBtn: HTMLButtonElement = document.getElementById(
-    'stop-btn'
+    'stop-btn',
   ) as HTMLButtonElement;
   stopBtn.style.display = 'inline-block';
 }
 
 export function hideStopButton(): void {
   const stopBtn: HTMLButtonElement = document.getElementById(
-    'stop-btn'
+    'stop-btn',
   ) as HTMLButtonElement;
   stopBtn.style.display = 'none';
 }
