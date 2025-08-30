@@ -1,7 +1,7 @@
-import {open} from '@tauri-apps/plugin-dialog';
-import {invoke} from '@tauri-apps/api/core';
-import {CmdArgs, LogSeverity} from './models';
-import {listen} from '@tauri-apps/api/event';
+import { open } from '@tauri-apps/plugin-dialog';
+import { invoke } from '@tauri-apps/api/core';
+import { CmdArgs, LogSeverity } from './models';
+import { listen } from '@tauri-apps/api/event';
 import {
   addSpacerToLog,
   clearLogSection,
@@ -29,10 +29,10 @@ document.addEventListener('DOMContentLoaded', () => {
   (document.getElementById('start-btn') as HTMLButtonElement).disabled = true;
 
   const browseFilesBtn = document.getElementById(
-    'browse-files-btn'
+    'browse-files-btn',
   ) as HTMLButtonElement;
   const browseListBtn = document.getElementById(
-    'browse-list-btn'
+    'browse-list-btn',
   ) as HTMLButtonElement;
 
   browseFilesBtn.addEventListener('click', async () => {
@@ -77,22 +77,22 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('start-btn')!.addEventListener('click', event => {
     const startBtn: HTMLButtonElement = event.target as HTMLButtonElement;
     const threadCountInput: HTMLInputElement = document.getElementById(
-      'thread-count'
+      'thread-count',
     )! as HTMLInputElement;
     const ffmpegOptionsInput: HTMLTextAreaElement = document.getElementById(
-      'ffmpeg-options'
+      'ffmpeg-options',
     )! as HTMLTextAreaElement;
     const outputPatternInput: HTMLInputElement = document.getElementById(
-      'output-pattern'
+      'output-pattern',
     )! as HTMLInputElement;
     const overwriteCheckbox: HTMLInputElement = document.getElementById(
-      'overwrite'
+      'overwrite',
     )! as HTMLInputElement;
     const verboseCheckbox: HTMLInputElement = document.getElementById(
-      'verbose'
+      'verbose',
     )! as HTMLInputElement;
     const deleteCheckbox: HTMLInputElement = document.getElementById(
-      'delete-source'
+      'delete-source',
     )! as HTMLInputElement;
 
     const args: CmdArgs = {
@@ -137,16 +137,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   listen<[string, number, string[]]>('job-finished', event => {
     const startBtn: HTMLButtonElement = document.getElementById(
-      'start-btn'
+      'start-btn',
     ) as HTMLButtonElement;
     const overWriteCheckBox: HTMLInputElement = document.getElementById(
-      'overwrite'
+      'overwrite',
     ) as HTMLInputElement;
     const verboseCheckBox: HTMLInputElement = document.getElementById(
-      'verbose'
+      'verbose',
     ) as HTMLInputElement;
     const deleteSourceCheckBox: HTMLInputElement = document.getElementById(
-      'delete-source'
+      'delete-source',
     ) as HTMLInputElement;
 
     startBtn.disabled = false;
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const logLine: string = `${successfulFiles} out of ${totalFiles} files have been successful. A detailed log has been written to ${event.payload[0]}`;
     updateLog(
       logLine,
-      totalFiles !== successfulFiles ? LogSeverity.ERROR : LogSeverity.INFO
+      totalFiles !== successfulFiles ? LogSeverity.ERROR : LogSeverity.INFO,
     );
 
     const failedPaths: string[] = event.payload[2];
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   listen<number>(
     'update-total-file-count',
-    event => (totalFiles = event.payload)
+    event => (totalFiles = event.payload),
   );
 
   listen<number>('progress-update', event => {
