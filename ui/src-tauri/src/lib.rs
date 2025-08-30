@@ -8,7 +8,7 @@ fn start_job(app: AppHandle, options: String) {
     let args = serde_json::from_str::<CmdArgs>(&options).unwrap();
 
     let app_handle = app.clone();
-    let paths = load_paths(&args);
+    let paths = load_paths(&args, &app_handle);
     let progress = Arc::new(Progress::new(paths.len(), args.eta));
     let logger = Arc::new(Logger::new(Arc::clone(&progress), app_handle.clone()));
     let processor = Processor::new(Arc::clone(&logger), Arc::clone(&progress));

@@ -1,21 +1,21 @@
-import { open } from '@tauri-apps/plugin-dialog';
-import { invoke } from '@tauri-apps/api/core';
-import { CmdArgs, LogSeverity } from './models';
-import { listen } from '@tauri-apps/api/event';
+import {open} from '@tauri-apps/plugin-dialog';
+import {invoke} from '@tauri-apps/api/core';
+import {CmdArgs, LogSeverity} from './models';
+import {listen} from '@tauri-apps/api/event';
 import {
-  updateFileCount,
-  updatePathsList,
-  updateFileList,
-  updateProgressBar,
-  showProgressBar,
-  showLogSection,
-  clearLogSection,
   addSpacerToLog,
-  updateLog,
-  prepareTabs,
-  validateButton,
-  showStopButton,
+  clearLogSection,
   hideStopButton,
+  prepareTabs,
+  showLogSection,
+  showProgressBar,
+  showStopButton,
+  updateFileCount,
+  updateFileList,
+  updateLog,
+  updatePathsList,
+  updateProgressBar,
+  validateButton,
 } from './dom';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -200,6 +200,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   listen<string>('log-update-error', event => {
+    updateLog(event.payload, LogSeverity.ERROR);
+  });
+
+  listen<string>('file-list-error', event => {
     updateLog(event.payload, LogSeverity.ERROR);
   });
 });
