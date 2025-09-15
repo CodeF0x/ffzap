@@ -10,10 +10,10 @@ repository = "https://github.com/CodeF0x/ffzap"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace.dependencies]
-chrono = "0.4.39"
-clap = { version = "4.5.20", features = ["derive"] }
+chrono = "0.4.42"
+clap = { version = "4.5.47", features = ["derive"] }
 dirs = "6.0.0"
 indicatif = "0.18.0"
-serde = "1.0.219"
-tauri = "2.6.2"
+serde = "1.0.224"
+tauri = "2.8.5"
 colored = "3.0.0"
