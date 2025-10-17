@@ -88,6 +88,8 @@ jobs:
           LATEST_RELEASE=$(gh api repos/${{ github.repository }}/releases/latest --jq '.tag_name')
           echo "latest_release=$LATEST_RELEASE" >> $GITHUB_OUTPUT
           echo "Latest release: $LATEST_RELEASE"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update latest release
         uses: softprops/action-gh-release@v2
