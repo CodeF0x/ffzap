@@ -5,6 +5,7 @@ pub mod progress;
 
 use std::process::exit;
 use std::{fs, io::ErrorKind};
+use std::path::Path;
 #[cfg(feature = "ui")]
 use tauri::{AppHandle, Emitter};
 pub use args::CmdArgs;
@@ -76,6 +77,55 @@ pub fn load_paths(
             }
         }
     } else {
-        cmd_args.input.clone().unwrap()
+        let paths = cmd_args.input.clone().unwrap();
+        let mut files: Vec<String> = vec![];
+
+        for p in paths {
+            let path = Path::new(&p);
+            if path.is_file() {
+                files.push(p);
+            } else if path.is_dir() {
+                let mut stack = vec![path.to_path_buf()];
+                while let Some(dir) = stack.pop() {
+                    match fs::read_dir(&dir) {
+                        Ok(entries) => {
+                            for entry_res in entries {
+                                if let Ok(entry) = entry_res {
+                                    let entry_path = entry.path();
+                                    if entry_path.is_dir() {
+                                        stack.push(entry_path);
+                                    } else if entry_path.is_file() {
+                                        if let Some(s) = entry_path.to_str() {
+                                            files.push(s.to_string());
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        Err(err) => {
+                            let error = format!("Failed to read directory {}: {}", dir.display(), err);
+                            eprintln!("{}", error);
+
+                            #[cfg(feature = "ui")]
+                            {
+                                let _ = app_handle.emit("file-list-error", error);
+                            }
+
+                            continue;
+                        }
+                    }
+                }
+            } else {
+                let error = format!("The path {} is neither a file nor a directory.", p);
+                eprintln!("{}", error);
+
+                #[cfg(feature = "ui")]
+                {
+                    let _ = app_handle.emit("file-list-error", error);
+                }
+            }
+        }
+
+        files
     }
 }

@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
   browseFilesBtn.addEventListener('click', async () => {
     const files: string[] | null = await open({
       multiple: true,
-      directory: false,
+      directory: true,
     });
 
     allFiles = files;

@@ -35,6 +35,9 @@
               </div>
               <div class="selected-files">
                 <h3>Selected Files (<span id="file-amount">0</span>)</h3>
+                <div class="info-text">
+                  If you selected an entire folder, not all files will be listed. They'll show up in the log / progressbar once you start the job.
+                </div>
                 <div class="file-list" id="file-list">Non selected</div>
               </div>
             </div>
@@ -45,9 +48,9 @@
                   Browse Files
                 </button>
               </div>
-              <div class="selected-files">
+              <div class="selected-file-list">
                 <h3>File List Path</h3>
-                <div class="file-list-path" id="file-list-path">
+                <div class="file-list" id="file-list-path">
                   None selected
                 </div>
               </div>
@@ -74,7 +77,7 @@
                 <span class="info-text"
                   >Most systems can handle 2. Increase for powerful computers.
                   Adding more threads does not automatically make your job
-                  faster!</span
+                  faster! Balance out for ffmpeg options accordingly.</span
                 >
               </div>
             </div>

@@ -226,10 +226,19 @@ body {
   margin-top: var(--space-xl);
 }
 
-.selected-files h3 {
+.selected-files h3,
+.selected-file-list h3 {
   font-size: var(--font-lg);
-  margin-bottom: var(--space-md);
+  margin-bottom: 0;
   color: var(--text-color);
+}
+
+.selected-files .info-text {
+  margin-bottom: var(--space-md);
+}
+
+.selected-file-list h3 {
+  margin-bottom: var(--space-md);
 }
 
 .file-list-input {
