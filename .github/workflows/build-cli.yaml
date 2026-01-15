@@ -54,26 +54,13 @@ jobs:
           fi
         shell: bash
 
-      - name: Compute SHA256 hash
-        run: |
-          if [ "${{ runner.os }}" == "Windows" ]; then
-            certutil -hashfile ffzap.exe SHA256 | tail -2 | head -1 > ffzap.exe.sha256
-          elif [ "${{ runner.os }}" == "macOS" ]; then
-            shasum -a 256 ${{ matrix.artifact_name }} > ${{ matrix.artifact_name }}.sha256
-          else
-            sha256sum ${{ matrix.artifact_name }} > ${{ matrix.artifact_name }}.sha256
-          fi
-        shell: bash
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: build-${{ matrix.os }}-${{ matrix.arch }}
           path: |
             ffzap.exe
-            ffzap.exe.sha256
             ${{ matrix.artifact_name }}
-            ${{ matrix.artifact_name }}.sha256
 
   release:
     needs: build
@@ -98,7 +85,6 @@ jobs:
           files: |
             **/*.exe
             **/*.tar.gz
-            **/*.sha256
           tag_name: ${{ steps.get_latest_release.outputs.latest_release }}
           draft: false
           prerelease: false
