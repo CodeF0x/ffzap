@@ -1095,6 +1095,7 @@ dependencies = [
  "indicatif",
  "serde",
  "tauri",
+ "walkdir",
 ]
 
 [[package]]

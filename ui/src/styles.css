@@ -195,6 +195,7 @@ body {
 /* File Input Section */
 .browse-files-btn-container {
   display: flex;
+  gap: var(--space-md);
   justify-content: center;
 }
 

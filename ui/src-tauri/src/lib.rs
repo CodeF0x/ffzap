@@ -13,8 +13,6 @@ fn start_job(app: AppHandle, options: String) {
     let logger = Arc::new(Logger::new(Arc::clone(&progress), app_handle.clone()));
     let processor = Processor::new(Arc::clone(&logger), Arc::clone(&progress));
 
-    println!("{:?}", paths);
-
     let _ = app_handle.emit("update-total-file-count", paths.len());
 
     thread::spawn(move || {
