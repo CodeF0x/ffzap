@@ -2,12 +2,12 @@
 use tauri::AppHandle;
 
 use crate::progress::Progress;
+use colored::*;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
 use std::path::{Display, PathBuf};
 use std::sync::{Arc, Mutex, MutexGuard};
-use colored::*;
 
 pub struct Logger {
     progress: Arc<Progress>,

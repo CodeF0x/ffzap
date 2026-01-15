@@ -1,7 +1,7 @@
 use clap::Parser;
+use colored::*;
 use ffzap_core::{load_paths, CmdArgs, Logger, Processor, Progress};
 use std::sync::Arc;
-use colored::*;
 
 fn main() {
     let cmd_args = CmdArgs::parse();

@@ -21,6 +21,7 @@ clap.workspace = true
 serde = { workspace = true, features = ["derive"] }
 tauri = { workspace = true, optional = true }
 colored = { workspace = true }
+walkdir = "2.5.0"
 
 
 [features]

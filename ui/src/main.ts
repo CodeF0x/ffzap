@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const browseListBtn = document.getElementById(
     'browse-list-btn',
   ) as HTMLButtonElement;
+  const browseFolderBtn = document.getElementById('browse-folder-btn') as HTMLButtonElement;
 
   browseFilesBtn.addEventListener('click', async () => {
     const files: string[] | null = await open({
@@ -49,6 +50,20 @@ document.addEventListener('DOMContentLoaded', () => {
     updateFileList(filesList);
     validateButton(allFiles, filesList);
   });
+  browseFolderBtn.addEventListener('click', async () => {
+    const path: string | null = await open({
+      multiple: false,
+      directory: true,
+    });
+
+    allFiles = path ? [path] : [];
+    filesList = null;
+
+    updateFileCount(allFiles?.length ?? 0);
+    updatePathsList(allFiles);
+    updateFileList(filesList);
+    validateButton(allFiles, filesList);
+  })
   browseListBtn.addEventListener('click', async () => {
     const file: string | null = await open({
       multiple: false,
